@@ -10,13 +10,10 @@ library(parallel)
 library(rstan)
 rstan_options("auto_write" = TRUE)
 
-stan_out <- function(model){
-	out <- c(MCMCglmm::posterior.mode(as.mcmc(as.data.frame(extract(model)))[,"sigma2_ID"]), summary(model)$summary["sigma2_ID",c(1,4,8,9)])
-	names(out) <- c("mode","mean","LCI","UCI","ESS")
-	out	
-}
-
 wd <- "~/github/bayes_perm/"
+
+source(paste0(wd,"R/functions.R"))
+
 
 perm_sim <- function(N_pop, N_perm, ICC, N_group, N_within,mc.cores=4){
 
