@@ -21,7 +21,7 @@ p_func <- function(actual,null) mean(actual<null)
 
 
 stan_out <- function(model){
-	out <- c(MCMCglmm::posterior.mode(as.mcmc(as.data.frame(extract(model)))[,"sigma2_ID"]), 
+	out <- c(MCMCglmm::posterior.mode(coda::as.mcmc(as.data.frame(extract(model)))[,"sigma2_ID"]), 
 		median(extract(model)$sigma2_ID),
 		summary(model)$summary["sigma2_ID",c(1,4,8,9)])
 	names(out) <- c("mode","median","mean","LCI","UCI","ESS")
