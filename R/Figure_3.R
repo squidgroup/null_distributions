@@ -37,14 +37,16 @@ setEPS()
 pdf(paste0(wd,"Figures/Fig3.pdf"), height=6, width=8)
 ICCs <- c(0,0.2,0.4)
 {
-par(mfrow=c(3,1),mar=c(5,5,2,1))
+par(mfrow=c(3,1),mar=c(4,4,2,1), cex.axis=0.75, mgp=c(2,0.5,0))
 for(j in seq_along(ICCs)){
 	plot_dat <- subset(p_perm, ICC==ICCs[j])
-	boxplot(mean~N_group + N_within,plot_dat,ylim=c(0,1), ylab=bquote(P[perm]), xlab="Number of Groups",boxwex=0.5, names=rep(c(20,40,80,160),3), pch=19, cex=0.5, col=rep(grey(c(1,0.8,0.6,0.4)),3))
+	# boxplot(mean~N_group + N_within,plot_dat,ylim=c(0,1), ylab=bquote(P[perm]), xlab="Number of Groups",boxwex=0.5, names=rep(c(20,40,80,160),3), pch=19, cex=0.5, col=rep(grey(c(1,0.8,0.6,0.4)),3))
+	beeswarm(mean~N_group + N_within,plot_dat, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Number of Groups", labels=rep(c(20,40,80,160),3), ylab=bquote(P[perm]),  ylim=c(0,1))
+
 	abline(v=c(4.5,8.5))
 	# abline(h=c(0.25,0.75))
 	mtext(c("2","4","8"),side=3,adj=c(0.15,0.5, 0.85), cex=0.8)
-mtext(paste0(letters[j],")"),2,padj=-5, las=1, line=3)
+mtext(paste0(letters[j],")"),2,padj=-5, las=1, line=2)
 
 }
 }
