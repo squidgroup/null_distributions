@@ -67,11 +67,14 @@ arrows(c(1,3,5,7)-0.4,0,c(1,3,5,7)+0.4,0,code=0, angle=90, length=0.05, col="red
 arrows(c(2,4,6,8)-0.4,0.2,c(2,4,6,8)+0.4,0.2,code=0, angle=90, length=0.05, col="red", lwd=2)
 abline(v=c(2.5,4.5,6.5))
 # mtext(c("ML","Posterior Mean","Posterior Mode"),side=3,adj=c(0.15,0.5, 0.85))
+mtext("a)",2,padj=-8, las=1, line=2)
 
-beeswarm(estimate~sim_var+type,p_long, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Between group variance", ylab="Estimate", labels=rep(c(0,0.2),4))#, labels=c("ML","Posterior Mean","Posterior Median","Posterior Mode"))
+
+beeswarm(estimate~sim_var+type,p_long, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Between group variance", ylab=bquote(P[perm]), labels=rep(c(0,0.2),4))#, labels=c("ML","Posterior Mean","Posterior Median","Posterior Mode"))
 # boxplot(estimate~sim_var+type,p_long, pch=19, cex=0.5,xlab="Between group variance", ylab=bquote(P[perm]),boxwex=0.5, names=rep(c(0,0.2),4))#, 
 abline(v=c(2.5,4.5,6.5))
 mtext(c("ML","Post. Mean","Post. Median","Post. Mode"),side=3,adj=c(0.1,0.35,0.65 ,0.9))
+mtext("b)",2,padj=-8, las=1, line=2)
 
 }
 
