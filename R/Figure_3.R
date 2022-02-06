@@ -2,6 +2,8 @@
 rm(list=ls())
 
 library(scales)
+library(beeswarm)
+
 wd <- "~/github/bayes_perm/"
 
 source(paste0(wd,"R/functions.R"))

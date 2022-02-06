@@ -18,6 +18,7 @@ Stack <- function(x, col2stack, value.name="value", group.name="group", levels=N
 }
 
 p_func <- function(actual,null) mean(actual<null)
+p_func_LRT <- function(actual,null) mean(actual>null)
 
 
 stan_out <- function(model){

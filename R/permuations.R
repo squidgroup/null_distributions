@@ -40,12 +40,13 @@ perm_sim <- function(N_pop, N_perm, ICC, N_group, N_within,mc.cores=4){
 
 		stan_mod <- sampling(LMM_stan, data=stan_dat, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
 
-		actual<-c(freq=as.numeric(summary(modF)$varcor),stan_out(stan_mod), LRT=LRT)
+		actual <- c(freq=as.numeric(summary(modF)$varcor),stan_out(stan_mod), LRT=LRT)
 
 		null <- do.call(rbind,lapply(1:N_perm,function(j){
 			perm_ID <- sample(dat[[i]][,ID], replace=FALSE)
 
-			null_modF <-suppressMessages(lmer(y~1+(1|perm_ID),dat[[i]], REML=FALSE))
+			null_modF <- suppressMessages(lmer(y~1+(1|perm_ID),dat[[i]], REML=FALSE))
+			null_LRT <- anova(null_modF,modF_null)$P[2]/2
 
 			null_dat <- list(
 				N = nrow(dat[[i]]),
@@ -55,7 +56,7 @@ perm_sim <- function(N_pop, N_perm, ICC, N_group, N_within,mc.cores=4){
 			)
 
 			null_mod <- sampling(LMM_stan, data=null_dat, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
-			c(freq=as.numeric(summary(null_modF)$varcor),stan_out(null_mod))
+			c(freq=as.numeric(summary(null_modF)$varcor),stan_out(null_mod), LRT=null_LRT)
 
 		}))
 		cat(i, " ")
@@ -65,10 +66,12 @@ perm_sim <- function(N_pop, N_perm, ICC, N_group, N_within,mc.cores=4){
 	return(dist_M)
 }
 
+
+set.seed(20211129)
 system.time({
-for(ICC in c(0,0.2,0.4)){
-	for(N_group in c(20,40,80,160)){
-		for(N_within in c(2,4,8)){
+for(N_within in c(2,4,8)){
+	for(ICC in c(0,0.2,0.4)){
+		for(N_group in c(20,40,80,160)){		
 			cat("\n",ICC,N_group,N_within,"\n")
 			sim_dat <- perm_sim(N_pop=100, N_perm=100, ICC=ICC, N_group=N_group, N_within=N_within,mc.cores=6)
 			save(sim_dat, file=paste0(wd,"Data/Intermediate/sims_",ICC,"_",N_group,"_",N_within,".Rdata"))
@@ -76,7 +79,6 @@ for(ICC in c(0,0.2,0.4)){
 	}
 }
 })
-
 
 
 ## prior used
