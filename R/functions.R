@@ -18,7 +18,10 @@ Stack <- function(x, col2stack, value.name="value", group.name="group", levels=N
 }
 
 p_func <- function(actual,null) mean(actual<null)
-p_func_LRT <- function(actual,null) mean(actual>null)
+p_func_LRT <- function(actual_p,null_p) mean(
+	qchisq(actual_p*2, df=1, lower.tail=FALSE)<
+	qchisq(null_p*2, df=1, lower.tail=FALSE))
+
 
 
 stan_out <- function(model){
@@ -26,6 +29,13 @@ stan_out <- function(model){
 		median(extract(model)$sigma2_ID),
 		summary(model)$summary["sigma2_ID",c(1,4,8,9)])
 	names(out) <- c("mode","median","mean","LCI","UCI","ESS")
+	out	
+}
+stan_out_RR <- function(model){
+	out <- cbind(MCMCglmm::posterior.mode(coda::as.mcmc(as.data.frame(extract(model)))[,c("sigma2_int","sigma2_slope")]), 
+		apply(as.data.frame(extract(model))[,c("sigma2_int","sigma2_slope")],2,median),
+		summary(model)$summary[c("sigma2_int","sigma2_slope"),c(1,4,8,9)])
+	colnames(out) <- c("mode","median","mean","LCI","UCI","ESS")
 	out	
 }
 
