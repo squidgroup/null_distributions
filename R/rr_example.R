@@ -1,7 +1,7 @@
 
 rm(list=ls())
 
-devtools::load_all("~/github/squid/R")
+devtools::load_all("~/github/squidSim/R")
 
 options(mc.cores = parallel::detectCores())
 
@@ -14,14 +14,13 @@ wd <- "~/github/bayes_perm/"
 
 source(paste0(wd,"R/functions.R"))
 
-
 set.seed(20220216)
 squid_dat <- simulate_population(
 	data_structure= make_structure(paste0("ID(200)"),repeat_obs=5),
 	parameters= list(
 		ID=list(
 			names=c("intercepts","slopes"),
-			vcov=matrix(c(0.2,0.05,0.05,0.05),2,2),
+			vcorr=matrix(c(0.2,0.5,0.5,0.05),2,2),
 			beta=c(1,0)
 		),
 		observation=list(
@@ -41,26 +40,6 @@ squid_dat <- simulate_population(
 dat <- get_population_data(squid_dat, list=TRUE)
 
 dat1<-dat[[1]]
-var(dat1$y)
-
-plot(y~environment,dat1)
-for(i in unique(dat1[,ID])){
-	dats <- subset(dat1,ID==i)
-	abline(lm(y~environment,dats))
-}
-
-mod1 <- lmer(y~environment + (environment|ID),dat1)
-mod2 <- lmer(y~environment + (0+environment|ID) + (1|ID),dat1)
-mod3 <- lmer(y~environment + (1|ID),dat1)
-mod4 <- lm(y~environment,dat1)
-anova(mod1,mod2)
-anova(mod3,mod2)
-anova(mod3,mod4)
-
-summary(mod1)
-summary(mod2)
-
-
 
 RR_stan <- stan_model(file = paste0(wd,"stan/rr_LMM.stan"))
 
