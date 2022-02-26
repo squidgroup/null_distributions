@@ -1,7 +1,7 @@
 
 rm(list=ls())
 
-devtools::load_all("~/github/squid/R")
+devtools::load_all("~/github/squidSim/R")
 
 options(mc.cores = parallel::detectCores())
 
@@ -36,7 +36,8 @@ perm_sim <- function(N_pop, N_perm, ICC, N_group, N_within,mc.cores=4){
 			N = nrow(dat[[i]]),
 			N_ID = length(unique(dat[[i]][,ID])),
 			y = dat[[i]][,y],
-			ID = dat[[i]][,ID])
+			ID = dat[[i]][,ID],
+			cauchy_scale=2)
 
 		stan_mod <- sampling(LMM_stan, data=stan_dat, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
 
@@ -52,7 +53,8 @@ perm_sim <- function(N_pop, N_perm, ICC, N_group, N_within,mc.cores=4){
 				N = nrow(dat[[i]]),
 				N_ID = length(unique(dat[[i]][,ID])),
 				y = dat[[i]][,y],
-				ID = perm_ID
+				ID = perm_ID,
+				cauchy_scale=2
 			)
 
 			null_mod <- sampling(LMM_stan, data=null_dat, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
