@@ -74,7 +74,20 @@ results <- mclapply(1:length(dat),function(i){
 			ID = perm_ID
 		)
 
-		null_mod <- sampling(RR_stan, data=null_dat, chains=1,iter=4000, warmup=1000, pars=c("sigma2_int","sigma2_slope"),, refresh=0)
+		null_mod <- sampling(RR_stan, data=null_dat, chains=1,iter=4000, warmup=1000, pars=c("sigma2_int","sigma2_slope"), refresh=0)
+		stan_out_RR(null_mod)
+
+		perm_y <- sample(dat[[i]][,y], replace=FALSE)
+
+		null_dat <- list(
+			N = nrow(dat[[i]]),
+			N_ID = length(unique(dat[[i]][,ID])),
+			y = perm_y,
+			x_1 = dat[[i]][,environment],
+			ID = dat[[i]][,ID]
+		)
+
+		null_mod <- sampling(RR_stan, data=null_dat, chains=1,iter=4000, warmup=1000, pars=c("sigma2_int","sigma2_slope"), refresh=0)
 		stan_out_RR(null_mod)
 
 	})
