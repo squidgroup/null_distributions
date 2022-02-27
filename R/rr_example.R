@@ -97,7 +97,7 @@ results <- mclapply(1:length(dat),function(i){
 
 	list(param = c(sim_var1=0.2,sim_var2=0.1, N_group=80, N_within=4), data=dat[[i]],actual=actual,null1=null1,null2=null2)
 
-},mc.cores=6)
+},mc.cores=8)
 
 
 save(results, file=paste0(wd,"Data/Intermediate/RR_sim.Rdata"))
@@ -169,6 +169,6 @@ results <- mclapply(1:length(dat),function(i){
 
 	list(param = c(sim_var1=0.2,sim_var2=0.1, N_group=80, N_within=4), data=dat[[i]],actual=actual,null1=null1,null2=null2)
 
-},mc.cores=6)
+},mc.cores=8)
 
 save(results, file=paste0(wd,"Data/Intermediate/RR_sim_null.Rdata"))
