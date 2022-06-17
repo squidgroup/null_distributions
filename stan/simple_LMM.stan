@@ -24,4 +24,5 @@ model{
 }
 generated quantities{
   real sigma2_ID = sigma_ID^2;
+  real sigma2_E = sigma_E^2;
 }

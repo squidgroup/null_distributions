@@ -1,0 +1,132 @@
+---
+title: Problems with estimating the posterior mode of a variance components
+---
+
+
+## Problem
+In order to estimate the mode of a posterior distribution of unknown form, we need to estimate a density function for that distribution, and then calculate the value for which this function is maximised. Typically this first stage is through kernel density estimation. 
+This process involves selecting a bandwidth, which is essentially how much smoothing there is in the kernel density estimation, and is similar to changing the amount of breaks in a histogram (see figure). 
+
+
+The density function by default extends the region it is estimating for slightly, which is how you can get values below 0 as you say (and the more the smoothing the more the distributions extend below 0 - see figure). The problem really comes when the distribution is bimodal. In the attached figure, the posterior distribution is the same, but the smoothing (controlled by the adjust argument in density) changes. The bottom row are histograms with different breakpoints, to show the similarity. The red line is the 'mode' calculated as the highest x value. As the smoothing gets less (lower adjust values) the kernel densities get very spikey which will mean the mode jumps around. In bimodal distributions, changing adjust can easily change which mode is higher, or even if there is two modes. adjust = 1 if the default in density, and adjust = 0.1 is the default in posterior.mode
+
+```{r, echo=FALSE, fig.width=10}
+load(file="~/Dropbox/0_Presentations/20220207_SEED/examples.Rdata")
+
+data<-res[[3]]$post
+
+par(mfcol=c(2,5))
+for(i in c(0.5,1,2,5,10)){
+	dx <- density(data, cut=0, adjust = 1/i, bw="SJ")
+#kernel="biweight"
+	pm <- dx$x[which.max(dx$y)]
+	# print(pm)
+	plot(dx$y~dx$x,type="l", main=paste0("adjust=",1/i), xlab="Posterior samples",ylab="Density")
+	if(i%in%c(1,10)) box("figure",col="blue",lwd=4)
+	abline(v=0, col="grey",lwd=1)
+	abline(v=pm, col="red",lwd=1)
+	text(0.475,0.75*max(dx$y),round(pm,3))
+	hist(data,breaks=10*i, main=paste0("breaks=",10*i),xlab="Posterior samples")
+	
+}
+
+```
+
+
+
+## Different functions in R
+
+Different packages that default to using kernel density estimation with the stats::density function, and their defaults in that function: 
+
+| Package | adjust | cut | bw | n |
+|:--------|:-------|:----|:---|:--|
+| MCMCglmm | **0.1** | default | nrd0 | 512 |
+| ggdist | 1 | **0** |  nrd0 | 512 |
+| bayestestR | 1 | **min(x)** |  **SJ** | **1024** |
+
+
+### {MCMCglmm}
+This seems to represent the predominantly used package
+```{r}
+MCMCglmm::posterior.mode
+```
+
+
+### {tidybayes} and {ggdist}
+```r
+ggdist::Mode
+```
+```{r,echo=FALSE}
+ggdist:::Mode.default
+```
+
+
+### {bayestestR}
+This is very flexible, and can be used to implement many kernel density estimation methods (the relative merits of which are discussed [here]( https://vita.had.co.nz/papers/density-estimation.pdf).
+
+```r
+bayestestR::map_estimate
+```
+```{r,echo=FALSE}
+bayestestR:::map_estimate.numeric
+```
+
+It uses `bayestestR::estimate_density` which is a wrapper for `stats::density` as well as three other functions
+```{r,echo=FALSE}
+bayestestR:::.estimate_density
+```
+
+
+## Impact on mode estimation
+
+```{r, echo=FALSE}
+wd <- "~/github/bayes_perm/"
+library(beeswarm)
+library(scales)
+
+p_mode <- function(x, adjust, ...) {
+  dx <- density(x, adjust = adjust, cut=0, bw="SJ")
+  dx$x[which.max(dx$y)]
+}
+
+post_summary <- function(post){
+  c(
+    mode0.1 = p_mode(post,adjust=0.1),
+    mode1 = p_mode(post,adjust=1),
+    median = median(post),
+    mean = mean(post) 
+  )
+}
+
+load(file=paste0(wd,"Data/Intermediate/modes.Rdata"))
+
+out2<-do.call(rbind,lapply(out,function(x)data.frame(estimate=post_summary(x),type=c("mode0.1","mode1","median","mean"))))
+out0_2<-do.call(rbind,lapply(out0,function(x)data.frame(estimate=post_summary(x),type=c("mode0.1","mode1","median","mean"))))
+out0.1_2<-do.call(rbind,lapply(out0.1,function(x)data.frame(estimate=post_summary(x),type=c("mode0.1","mode1","median","mean"))))
+
+
+beeswarm(estimate~type,out2, pch=19, cex=0.3, col=alpha(1,0.3),method = "compactswarm",corral="wrap", ylab="Estimate")
+points(with(out2,tapply(estimate,type,mean)), pch=19,col="red")
+abline(h=0.2,col="blue")
+
+  beeswarm(estimate~type,out0.1_2, pch=19, cex=0.3, col=alpha(1,0.3),method = "compactswarm",corral="wrap", ylab="Estimate")
+points(with(out0.1_2,tapply(estimate,type,median)), pch=19,col="red")
+abline(h=0.1,col="blue")
+
+  beeswarm(estimate~type,out0_2, pch=19, cex=0.3, col=alpha(1,0.3),method = "compactswarm",corral="wrap", ylab="Estimate")
+points(with(out0_2,tapply(estimate,type,median)), pch=19,col="red")
+abline(h=0,col="blue")
+
+# out,out0.1,out0,
+```
+
+
+### Refs
+Kruscke Doing Bayesian Data analysis
+p87 - describes the loss functions of mean, median and mode coherently
+p146 - effect of posterior sample size on mode 
+p205 - sensitivity of mode estimation /unstable. median is most stable
+
+
+
+

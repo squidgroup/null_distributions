@@ -23,7 +23,7 @@ for(i in 1:length(results)){
 ###
 # -- FIGURE 3
 ###
-
+names(all[[1]])
 
 p_perm <- as.data.frame(do.call(rbind,lapply(all, function(z){
 	t(sapply(z, function(x) c(x$param,
@@ -34,7 +34,7 @@ p_perm <- as.data.frame(do.call(rbind,lapply(all, function(z){
 		)))
 })))
 # p_perm<-subset(p_perm,ICC!=0.8 & N_within!=16)
-
+head(p_perm)
 
 # setEPS()
 # pdf(paste0(wd,"Figures/Fig3.pdf"), height=6, width=8)

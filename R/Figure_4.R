@@ -24,9 +24,11 @@ for(i in 1:length(results)){
 
 power <- as.data.frame(t(sapply(all,function(z){
 	c(
-		z[[1]]$param,LRT=mean(sapply(z, function(x) x$actual["LRT"])< 0.05),
+		z[[1]]$param,
+		LRT=mean(sapply(z, function(x) x$actual["LRT"])< 0.05),
 		freq=mean(sapply(z, function(x) p_func(x$actual["freq"],x$null[,"freq"]) < 0.05)),
 		mean=mean(sapply(z, function(x) p_func(x$actual["mean"],x$null[,"mean"]) < 0.05)),
+		median=mean(sapply(z, function(x) p_func(x$actual["median"],x$null[,"median"]) < 0.05)),
 		mode=mean(sapply(z, function(x) p_func(x$actual["mode"],x$null[,"mode"]) < 0.05))
 	)
 })))
@@ -68,10 +70,10 @@ par(mar=c(4,4,1,1), mfrow=c(2,1), cex.axis=0.75, mgp=c(2,0.5,0))
 for(j in seq_along(ICCs)){
 	plot_dat <- subset(power, ICC==ICCs[j])
 	plot_dat2 <- subset(power_dist, ICC==ICCs[j])
-	plot(mean~N_group,plot_dat,xlim=c(20,160),ylim=c(0,1), ylab="Power", xlab="Number of Groups")
+	plot(median~N_group,plot_dat,xlim=c(20,160),ylim=c(0,1), ylab="Power", xlab="Number of Groups")
 	points(power~N_group,plot_dat2, pch=17)
 	for(i in seq_along(within_groups)){
-		lines(mean~N_group,subset(plot_dat, N_within==within_groups[i]), col=cols[i])	
+		lines(median~N_group,subset(plot_dat, N_within==within_groups[i]), col=cols[i])	
 		lines(power~N_group,subset(plot_dat2, N_within==within_groups[i]), col=cols[i])	
 	}
 	mtext(paste0(letters[j],")"),2,padj=-9, las=1, line=3)
@@ -82,3 +84,48 @@ for(j in seq_along(ICCs)){
 }
 dev.off()
 
+
+
+ICCs <- c(0.2,0.4)
+
+{
+	par(mar=c(4,4,1,1), mfrow=c(3,1), cex.axis=0.75, mgp=c(2,0.5,0))
+for(j in seq_along(ICCs)){
+	plot_dat <- subset(power, ICC==ICCs[j])
+	plot_dat2 <- subset(power_dist, ICC==ICCs[j])
+	plot(mean~N_group,plot_dat,xlim=c(20,160),ylim=c(0,1), ylab="Power", xlab="Number of Groups")
+	points(median~N_group,plot_dat, pch=17)
+	points(mode~N_group,plot_dat, pch=16)
+	for(i in seq_along(within_groups)){
+		lines(mean~N_group,subset(plot_dat, N_within==within_groups[i]), col=cols[i],lty=1)	
+		lines(median~N_group,subset(plot_dat, N_within==within_groups[i]), col=cols[i],lty=2)	
+		lines(mode~N_group,subset(plot_dat, N_within==within_groups[i]), col=cols[i],lty=3)	
+		# lines(power~N_group,subset(plot_dat2, N_within==within_groups[i]), col=cols[i])	
+	}
+	mtext(paste0(letters[j],")"),2,padj=-9, las=1, line=3)
+	# mtext("a)",2,padj=-12, las=1, line=2)
+}
+
+
+	plot_dat <- subset(power, ICC==0)
+	plot(mean~N_group,plot_dat,xlim=c(20,160),ylim=c(0,0.12), ylab="False Positive Rate", xlab="Number of Groups")
+	points(median~N_group,plot_dat, pch=17)
+	points(mode~N_group,plot_dat, pch=16)
+	for(i in seq_along(within_groups)){
+		lines(mean~N_group,subset(plot_dat, N_within==within_groups[i]), col=cols[i])	
+				lines(median~N_group,subset(plot_dat, N_within==within_groups[i]), col=cols[i],lty=2)	
+		lines(mode~N_group,subset(plot_dat, N_within==within_groups[i]), col=cols[i],lty=3)	
+
+		# lines(power~N_group,subset(plot_dat2, N_within==within_groups[i]), col=cols[i])	
+	}
+	mtext("c)",2,padj=-9, las=1, line=3)
+	# mtext("a)",2,padj=-12, las=1, line=2)
+}
+	long <-Stack(plot_dat, col2stack = c("LRT","freq","mean","median","mode"),value.name = "estimate",group.name = "type")  
+
+plot(mean~median,power)
+plot(mode~median,power);abline(0,1)
+
+
+
+boxplot(estimate~type,long)
