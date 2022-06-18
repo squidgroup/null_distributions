@@ -1,3 +1,20 @@
+
+## from adapted from MCMCglmm::posterior.mode
+post_mode <- function(x, adjust=1, cut=0, bw="SJ", ...) {
+  dx <- density(x, adjust = adjust, cut=cut, bw=bw)
+  dx$x[which.max(dx$y)]
+}
+
+stan_out <- function(model){
+	out <- c(
+		post_mode(extract(model)$sigma2_ID,adjust=0.1),
+		post_mode(extract(model)$sigma2_ID,adjust=1), 
+		median(extract(model)$sigma2_ID),
+		summary(model)$summary["sigma2_ID",c(1,4,8,9)])
+	names(out) <- c("mode0.1","mode1","median","mean","LCI","UCI","ESS")
+	out	
+}
+
 gaussian_mods <- function(dat){
 		data <- dat[,c("y","ID")]
 		data$ID <- as.numeric(as.factor(data$ID))
@@ -13,7 +30,6 @@ gaussian_mods <- function(dat){
 
 		stan_mod <- sampling(LMM_stan, data=stan_dat, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID","sigma2_E"), refresh=0)
 		
-
 		list(summary = c(freq=as.numeric(summary(modF)$varcor),stan_out(stan_mod)), data=data, post = as.data.frame(extract(stan_mod, permuted=FALSE)[,,1:2]))
 }
 
@@ -43,21 +59,6 @@ p_func_LRT <- function(actual_p,null_p) mean(
 	qchisq(actual_p*2, df=1, lower.tail=FALSE)<
 	qchisq(null_p*2, df=1, lower.tail=FALSE))
 
-## from adapted from MCMCglmm::posterior.mode
-post_mode <- function(x, adjust=1, cut=0, bw="SJ", ...) {
-  dx <- density(x, adjust = adjust, cut=cut, bw=bw)
-  dx$x[which.max(dx$y)]
-}
-
-stan_out <- function(model){
-	out <- c(
-		post_mode(extract(model)$sigma2_ID,adjust=0.1),
-		post_mode(extract(model)$sigma2_ID,adjust=1), 
-		median(extract(model)$sigma2_ID),
-		summary(model)$summary["sigma2_ID",c(1,4,8,9)])
-	names(out) <- c("mode","median","mean","LCI","UCI","ESS")
-	out	
-}
 stan_out_RR <- function(model){
 	out <- cbind(MCMCglmm::posterior.mode(coda::as.mcmc(as.data.frame(extract(model)))[,c("sigma2_int","sigma2_slope")]), 
 		apply(as.data.frame(extract(model))[,c("sigma2_int","sigma2_slope")],2,median),

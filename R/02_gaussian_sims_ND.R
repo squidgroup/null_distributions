@@ -3,29 +3,24 @@ rm(list=ls())
 
 devtools::load_all("~/github/squidSim/R")
 
-options(mc.cores = parallel::detectCores())
-
 library(lme4)
 library(parallel)
 library(rstan)
 rstan_options("auto_write" = TRUE)
+options(mc.cores = parallel::detectCores())
 
 wd <- "~/github/bayes_perm/"
 
 source(paste0(wd,"R/00_functions.R"))
 
-n_pop=200
-
-LMM_stan <- stan_model(file = paste0(wd,"stan/simple_LMM.stan"))
 
 
-
-perm_boot <- function(output, N_perm, N_boot){
-
+perm_boot <- function(output, N_perm=100, N_boot=100){
+#output<-out[[1]]
 	data <- output$data
-  ICC=output$ICC
-  N_group=output$N_group
-  N_within=output$N_within
+  ICC <- output$ICC
+  N_group <- output$N_group
+  N_within <- output$N_within
 
 	perm <- do.call(rbind,lapply(1:N_perm,function(j){
 		data[,"ID"] <- sample(data[,"ID"], replace=FALSE)
@@ -35,7 +30,7 @@ perm_boot <- function(output, N_perm, N_boot){
 
 	bs_dat_all<-simulate_population(
 		data_structure= make_structure(paste0("ID(",N_group,")"),repeat_obs=N_within),
-		parameters= list(residual=list(vcov=median(rowSums(data$post)))),
+		parameters= list(residual=list(vcov=median(rowSums(output$post)))),
 		n_pop=N_boot
 	)
 
@@ -45,34 +40,27 @@ perm_boot <- function(output, N_perm, N_boot){
 
 	}))
 
-	list(param = c(ICC=ICC, N_group=N_group, N_within=N_within),output$summary,actual=perm=perm, bootstrap=bootstrap)
+	list(param = c(ICC=ICC, N_group=N_group, N_within=N_within),actual=output$summary,perm=perm, bootstrap=bootstrap)
 
 }
-#	cat(i, " ")
 
 
+LMM_stan <- stan_model(file = paste0(wd,"stan/simple_LMM.stan"))
+pops <- 1:100
+sets <- expand.grid(ICC=c(0,0.2,0.4),N_group=c(20,40,80,160),N_within=c(2,4))
 
+for(j in 1:12){
+	cat("\n set:",as.matrix(sets[j,]), "\n")
+	
+	load(paste0(wd,"Data/Intermediate/gaus_sims_",sets[j,"ICC"],"_",sets[j,"N_group"],"_",sets[j,"N_within"],".Rdata"))
 
-set.seed("202206171")
+	set.seed(paste0("20220618",j,min(pops)))
 
-ICC=0
-
-squid_dat_0 <- simulate_population(
-	data_structure= ds,
-	parameters= list(residual=list(vcov=1-ICC)),
-	n_pop=n_pop,
-	sample_type="nested",
-	sample_param=samples
-)
-
-for (j in 1:nrow(squid_dat_0$sample_param)){
-	dat <- get_sample_data(squid_dat_0, sample_set = j, list=TRUE)
-	param <- squid_dat_0$sample_param[j,]
-		cat("\n set:",param, "\n")
-	out <- mclapply(1:length(dat),function(i){
+	PB_out <- mclapply(pops,function(i){
 		cat(i, " ")
-		c(gaussian_mods(dat[[i]]),ICC=ICC, N_group=param[1], N_within=param[2])
+		perm_boot(out[[i]])
 	},mc.cores=8)
-	save(out, file=paste0(wd,"Data/Intermediate/gaus_sims_",ICC,"_",param[1],"_",param[2],".Rdata"))
-
+	save(PB_out, file=paste0(wd,"Data/Intermediate/gaus_PB_",sets[j,"ICC"],"_",sets[j,"N_group"],"_",sets[j,"N_within"],".Rdata"))
 }
+	
+
