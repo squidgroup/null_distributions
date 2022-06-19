@@ -46,28 +46,36 @@ perm_boot <- function(output, N_perm=100, N_boot=100){
 
 
 LMM_stan <- stan_model(file = paste0(wd,"stan/simple_LMM.stan"))
-pops <- 1:100
+pops <- 101:102
 sets <- expand.grid(ICC=c(0,0.2,0.4),N_group=c(20,40,80,160),N_within=c(2,4))
 
-<<<<<<< HEAD
-for(j in 10:12){
-=======
-for(j in 13:24){
->>>>>>> 545af9daa967532aefdafb8ce43760db41a99253
+for(j in 1:24){
 	cat("\n set:",as.matrix(sets[j,]), "\n")
-	
-	load(paste0(wd,"Data/Intermediate/gaus_sims_",sets[j,"ICC"],"_",sets[j,"N_group"],"_",sets[j,"N_within"],".Rdata"))
 
-	set.seed(paste0("220618",j,min(pops)))
+	file_end <- paste0(sets[j,"ICC"],"_",sets[j,"N_group"],"_",sets[j,"N_within"],".Rdata")
+	
+	load(paste0(wd,"Data/Intermediate/gaus_sims_",file_end))
+
+	set.seed(paste0("2206",j,min(pops)))
 
 	PB_out <- mclapply(pops,function(i){
 		cat(i, " ")
 		perm_boot(out[[i]])
 	},mc.cores=8)
-	save(PB_out, file=paste0(wd,"Data/Intermediate/gaus_PB_",sets[j,"ICC"],"_",sets[j,"N_group"],"_",sets[j,"N_within"],".Rdata"))
+
+# is it exists already, join them together and save the two	
+	file <- paste0("gaus_PB_",file_end)
+	if(file %in% list.files(paste0(wd,"Data/Intermediate/"))){
+		PB_out2 <- PB_out
+		load(paste0(wd,"Data/Intermediate/",file))
+		PB_out <- c(PB_out, PB_out2)
+	}
+
+	save(PB_out, file=paste0(wd,"Data/Intermediate/",file))
 }
 
 
-# is it exists, PB_out2 <- PB_out load, c(PB_out, PB_out2), and save the two	
-#	save(PB_out, file=paste0(wd,"Data/Intermediate/gaus_PB_",sets[j,"ICC"],"_",sets[j,"N_group"],"_",sets[j,"N_within"],".Rdata"))
+
+
+#	save(PB_out, file=paste0(wd,"Data/Intermediate/gaus_PB_",file_end))
 
