@@ -49,12 +49,12 @@ LMM_stan <- stan_model(file = paste0(wd,"stan/simple_LMM.stan"))
 pops <- 1:100
 sets <- expand.grid(ICC=c(0,0.2,0.4),N_group=c(20,40,80,160),N_within=c(2,4))
 
-for(j in 1:12){
+for(j in 13:24){
 	cat("\n set:",as.matrix(sets[j,]), "\n")
 	
 	load(paste0(wd,"Data/Intermediate/gaus_sims_",sets[j,"ICC"],"_",sets[j,"N_group"],"_",sets[j,"N_within"],".Rdata"))
 
-	set.seed(paste0("20220618",j,min(pops)))
+	set.seed(paste0("220618",j,min(pops)))
 
 	PB_out <- mclapply(pops,function(i){
 		cat(i, " ")
@@ -62,5 +62,8 @@ for(j in 1:12){
 	},mc.cores=8)
 	save(PB_out, file=paste0(wd,"Data/Intermediate/gaus_PB_",sets[j,"ICC"],"_",sets[j,"N_group"],"_",sets[j,"N_within"],".Rdata"))
 }
-	
+
+
+# is it exists, PB_out2 <- PB_out load, c(PB_out, PB_out2), and save the two	
+#	save(PB_out, file=paste0(wd,"Data/Intermediate/gaus_PB_",sets[j,"ICC"],"_",sets[j,"N_group"],"_",sets[j,"N_within"],".Rdata"))
 
