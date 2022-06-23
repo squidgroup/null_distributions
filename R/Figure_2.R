@@ -29,6 +29,8 @@ actual<-as.data.frame(do.call(rbind,lapply(results, function(y){
 	}))
 } )))
 
+actual<-subset(actual,N_group!=160)
+
 nrow(actual)
 
 actual$mean_bias<-actual$mean-actual$ICC
@@ -48,6 +50,8 @@ plot(accuracy$mean_bias-accuracy$median_bias);abline(h=0)
 setEPS()
 pdf(paste0(wd,"Figures/Fig_bias.pdf"), height=8, width=10)
 {
+
+line_coords <- (1:7)*3+0.5
 	par(mfrow=c(4,1), mar=c(2,4,3,1))
 
 plot(bias$mean_bias, pch=19, ylim=c(-0.2,0.2), ylab="Bias", xaxt="n")
@@ -55,10 +59,11 @@ abline(h=0)
 points(bias$median_bias, pch=19,col="red")
 points(bias$mode1_bias, pch=19,col="blue")
 points(bias$mode0.1_bias, pch=19,col="green")
-	abline(v=(1:5)*4+0.5)
+	abline(v=line_coords)
 axis(1,1:24,rep(c(20,40,80,160),6))
-mtext(c("","0","","0.2","","0.4",""),side=3,adj=c(seq(0,1,length.out=7)),line=1)
-mtext(c("","2","4","2","4","2","4"),side=3,adj=c(seq(0,1,length.out=7)-1/12))
+
+mtext(c("","0","","0.1","","0.2","","0.4",""),side=3,adj=c(seq(0,1,length.out=9)),line=1)
+mtext(c("","2","4","2","4","2","4","2","4"),side=3,adj=c(seq(0,1,length.out=9)-1/16))
 legend("bottomleft",c("mean","median","mode-0.1","mode-1"), pch=19, col=c(1,2,3,4))
 
 plot(abs_bias$mean_bias, pch=19, ylim=c(0,0.4), ylab="Absolute Bias", xaxt="n")
@@ -66,7 +71,7 @@ abline(h=0)
 points(abs_bias$median_bias, pch=19,col="red")
 points(abs_bias$mode1_bias, pch=19,col="blue")
 points(abs_bias$mode0.1_bias, pch=19,col="green")
-	abline(v=(1:5)*4+0.5)
+	abline(v=line_coords)
 axis(1,1:24,rep(c(20,40,80,160),6))
 
 plot(accuracy$mean_bias, pch=19, ylim=c(0,0.4), ylab="RMSE", xaxt="n")
@@ -74,7 +79,7 @@ abline(h=0)
 points(accuracy$median_bias, pch=19,col="red")
 points(accuracy$mode1_bias, pch=19,col="blue")
 points(accuracy$mode0.1_bias, pch=19,col="green")
-	abline(v=(1:5)*4+0.5)
+	abline(v=line_coords)
 axis(1:24,rep(c(20,40,80,160),4))
 axis(1,1:24,rep(c(20,40,80,160),6))
 
@@ -83,7 +88,7 @@ abline(h=0)
 points(precision$median, pch=19,col="red")
 points(precision$mode1, pch=19,col="blue")
 points(precision$mode0.1, pch=19,col="green")
-	abline(v=(1:5)*4+0.5)
+	abline(v=line_coords)
 axis(1,1:24,rep(c(20,40,80,160),6))
 
 }
