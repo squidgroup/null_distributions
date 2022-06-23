@@ -14,33 +14,67 @@ list_names <- gsub("gaus_PB_|.Rdata","",results)
 
 
 i=15
-	load(paste0(wd,"Data/Intermediate/",results[i]))
+	
 
 x<-PB_out[[1]]
-x$perm
-out<-t(sapply(PB_out, function(x){
-	c(x$param,
-	freq_perm = p_func(x$actual["freq"],x$perm[,"freq"]),
-	freq_boot = p_func(x$actual["freq"],x$boot[,"freq"]),
-	mean_perm = p_func(x$actual["mean"],x$perm[,"mean"]),
-	mean_boot = p_func(x$actual["mean"],x$boot[,"mean"]),
-	median_perm = p_func(x$actual["median"],x$perm[,"median"]),
-	median_boot = p_func(x$actual["median"],x$boot[,"median"]),
-	mode0.1_perm = p_func(x$actual["mode0.1"],x$perm[,"mode0.1"]),
-	mode0.1_boot = p_func(x$actual["mode0.1"],x$boot[,"mode0.1"]),
-	mode1_perm = p_func(x$actual["mode1"],x$perm[,"mode1"]),
-	mode1_boot = p_func(x$actual["mode1"],x$boot[,"mode1"])
-)
-}))
+colnames(x$perm)
+ tnames <- c("freq","mode0.1","mode1","median","mean","LCI","UCI","ESS")
 
-plot(out[,"mean_perm"],out[,"mean_boot"])
-plot(out[,"mean_perm"],out[,"median_perm"])
-plot(out[,"mean_boot"],out[,"median_boot"])
+ 
+lapply(results, function(i){
+  load(paste0(wd,"Data/Intermediate/",i))
+  for(j in 1:length(PB_out)){
+  	names(PB_out[[j]]$actual)<-c("freq","mode0.1","mode1","median","mean","LCI","UCI","ESS")
+  }
+  save(PB_out, file=paste0(wd,"Data/Intermediate/",i))
+})
+check<-lapply(results, function(i){
+  load(paste0(wd,"Data/Intermediate/",i))
+  t(sapply(PB_out, function(x){
+		c(a=all(tnames == names(x$actual) ),p=all( tnames == colnames(x$perm) ),b=all( tnames == colnames(x$boot)))
+	}))
+})
+all(check)
 
-sum(out[,"median_boot"]<0.05)/nrow(out)
-sum(out[,"median_perm"]<0.05)/nrow(out)
+p_perm<-as.data.frame(do.call(rbind,lapply(results, function(i){
+  load(paste0(wd,"Data/Intermediate/",i))
+  t(sapply(PB_out, function(x){
+		c(x$param,
+		freq_perm = p_func(x$actual["freq"],x$perm[,"freq"]),
+		freq_boot = p_func(x$actual["freq"],x$boot[,"freq"]),
+		mean_perm = p_func(x$actual["mean"],x$perm[,"mean"]),
+		mean_boot = p_func(x$actual["mean"],x$boot[,"mean"]),
+		median_perm = p_func(x$actual["median"],x$perm[,"median"]),
+		median_boot = p_func(x$actual["median"],x$boot[,"median"]),
+		mode0.1_perm = p_func(x$actual["mode0.1"],x$perm[,"mode0.1"]),
+		mode0.1_boot = p_func(x$actual["mode0.1"],x$boot[,"mode0.1"]),
+		mode1_perm = p_func(x$actual["mode1"],x$perm[,"mode1"]),
+		mode1_boot = p_func(x$actual["mode1"],x$boot[,"mode1"]),
+		median_ratio_boot = x$actual["median"]/median(x$boot[,"median"]),
+		mode1_ratio_boot = x$actual["mode1"]/median(x$boot[,"mode1"])
 
+		)
+	}))
+})))
+all$total_n <- all$N_group*all$N_within
+head(all)
+plot(log(median_ratio_boot.median)~median_boot, all, col=c(1:4)[as.factor(all$ICC)])
+abline(v=0.05, h=1)
+aggregate(log(median_ratio_boot.median)~ICC + N_within +N_group,all,var)
+boxplot(median_ratio_boot.median~ICC,all)
+boxplot(log(median_ratio_boot.median)~total_n+ICC,all, ylim=c(-5,5))
+boxplot(log(mode1_ratio_boot.mode1)~total_n+ICC,all)
 
+boxplot(median_boot~total_n+ICC,all)
+
+plot(all[,"mean_perm"],all[,"mean_boot"])
+plot(all[,"mean_perm"],all[,"median_perm"])
+plot(all[,"mean_boot"],all[,"median_boot"])
+plot(all[,"mean_boot"],all[,"mode0.1_boot"])
+plot(all[,"mean_boot"],all[,"freq_boot"])
+
+plot(all[,"mean_boot"],all[,"mode1_boot"])
+plot(all[,"median_boot"],all[,"mode1_boot"])
 
 
 ## get all results into a list
@@ -93,12 +127,12 @@ p_perm<-subset(p_perm,ICC%in%c(0,0.2) & N_within==2)
 
 setEPS()
 pdf(paste0(wd,"Figures/Fig3.pdf"), height=6, width=8)
-ICCs <- c(0,0.2)
+ICCs <- c(0,0.2,0.4)
 {
-par(mfrow=c(2,1),mar=c(4,4,2,1), cex.axis=0.75, mgp=c(2,0.5,0))
+par(mfrow=c(3,1),mar=c(4,4,2,1), cex.axis=0.75, mgp=c(2,0.5,0))
 for(j in seq_along(ICCs)){
 	plot_dat <- subset(p_perm, ICC==ICCs[j])
-	beeswarm(mean~N_group + N_within,plot_dat, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Number of Groups", labels=rep(c(20,40,80,160),3), ylab=bquote(P[perm]),  ylim=c(0,1))
+	beeswarm(mean_boot~N_group + N_within,plot_dat, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Number of Groups", labels=rep(c(20,40,80,160),3), ylab=bquote(P[perm]),  ylim=c(0,1))
 
 # mtext(paste0(letters[j],")"),2,padj=-5, las=1, line=2)
 
@@ -107,21 +141,36 @@ for(j in seq_along(ICCs)){
 dev.off()
 
 {
-	power_dat <- aggregate(mean~N_group+ICC,p_perm,function(x) sum(x<=0.05)/100)
+	power_dat <- aggregate(cbind(mode1_boot,mode0.1_boot,mean_boot)~N_group+ N_within+ICC,p_perm,function(x) mean(x<=0.05))
 par(mfrow=c(2,1),mar=c(4,4,2,1), cex.axis=0.75, mgp=c(2,0.5,0))
 plot(NA,xlim=c(0,160),xlab="Number of Groups", ylab="Power",  ylim=c(0,1))
 abline(h=0.05, col="grey")
 abline(h=c(0.025,0.075), col="grey")
 for(j in seq_along(ICCs)){
-	points(mean~N_group,power_dat, subset=ICC==ICCs[j], col=j, pch=19)
-	lines(mean~N_group,power_dat, subset=ICC==ICCs[j], col=j, lwd=2)
+	points(mean_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=19, type="b")
+	points(mode0.1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=18, type="b")
+		points(mode1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=17, type="b")
+
+	# lines(mean_boot~N_group,power_dat, subset=ICC==ICCs[j], col=j, lwd=2)
+}
+
+plot(NA,xlim=c(0,160),xlab="Number of Groups", ylab="Power",  ylim=c(0,1))
+abline(h=0.05, col="grey")
+abline(h=c(0.028,0.081), col="grey")
+for(j in seq_along(ICCs)){
+	points(mean_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=19, type="b")
+		points(mode0.1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=18, type="b")
+
+	# lines(mean_boot~N_group,power_dat, subset=ICC==ICCs[j], col=j, lwd=2)
 }
 }
 
 
 par(mfrow=c(2,2))
-plot(mean~mode,p_perm)
-plot(mean~median,p_perm)
-plot(mean~freq,p_perm)
-plot(mode~freq,p_perm)
-cor(p_perm$mean,p_perm$mode)
+plot(mode1_boot~mode0.1_boot,p_perm)
+plot(mean_boot~mode1_boot,p_perm)
+plot(mean_boot~mode0.1_boot,p_perm)
+plot(mean_boot~median_boot,p_perm)
+plot(mean_boot~freq_boot,p_perm)
+plot(mode0.1_boot~freq_boot,p_perm)
+# cor(p_perm$mean,p_perm$mode)

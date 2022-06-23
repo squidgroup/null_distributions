@@ -23,9 +23,9 @@ gaussian_mods <- function(dat){
 
 		stan_dat <- list(
 			N = nrow(data),
-			N_ID = length(unique(data[,ID])),
-			y = data[,y],
-			ID = as.numeric(as.factor(data[,ID])),
+			N_ID = length(unique(data[,"ID"])),
+			y = data[,"y"],
+			ID = as.numeric(as.factor(data[,"ID"])),
 			cauchy_scale=2)
 
 		stan_mod <- sampling(LMM_stan, data=stan_dat, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID","sigma2_E"), refresh=0)
