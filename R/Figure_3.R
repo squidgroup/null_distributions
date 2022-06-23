@@ -6,11 +6,42 @@ library(beeswarm)
 
 wd <- "~/github/bayes_perm/"
 
-source(paste0(wd,"R/functions.R"))
+source(paste0(wd,"R/00_functions.R"))
 
 files <- list.files(paste0(wd,"Data/Intermediate"))
-results <- files[grep("sims",files)]
-list_names <- gsub("sims_|.Rdata","",results)
+results <- files[grep("gaus_PB",files)]
+list_names <- gsub("gaus_PB_|.Rdata","",results)
+
+
+i=15
+	load(paste0(wd,"Data/Intermediate/",results[i]))
+
+x<-PB_out[[1]]
+x$perm
+out<-t(sapply(PB_out, function(x){
+	c(x$param,
+	freq_perm = p_func(x$actual["freq"],x$perm[,"freq"]),
+	freq_boot = p_func(x$actual["freq"],x$boot[,"freq"]),
+	mean_perm = p_func(x$actual["mean"],x$perm[,"mean"]),
+	mean_boot = p_func(x$actual["mean"],x$boot[,"mean"]),
+	median_perm = p_func(x$actual["median"],x$perm[,"median"]),
+	median_boot = p_func(x$actual["median"],x$boot[,"median"]),
+	mode0.1_perm = p_func(x$actual["mode0.1"],x$perm[,"mode0.1"]),
+	mode0.1_boot = p_func(x$actual["mode0.1"],x$boot[,"mode0.1"]),
+	mode1_perm = p_func(x$actual["mode1"],x$perm[,"mode1"]),
+	mode1_boot = p_func(x$actual["mode1"],x$boot[,"mode1"])
+)
+}))
+
+plot(out[,"mean_perm"],out[,"mean_boot"])
+plot(out[,"mean_perm"],out[,"median_perm"])
+plot(out[,"mean_boot"],out[,"median_boot"])
+
+sum(out[,"median_boot"]<0.05)/nrow(out)
+sum(out[,"median_perm"]<0.05)/nrow(out)
+
+
+
 
 ## get all results into a list
 all <- list()

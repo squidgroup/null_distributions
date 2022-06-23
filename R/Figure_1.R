@@ -10,7 +10,7 @@ options(mc.cores = parallel::detectCores())
 
 wd <- "~/github/bayes_perm/"
 
-source(paste0(wd,"R/functions.R"))
+source(paste0(wd,"R/00_functions.R"))
 
 
 set.seed(1250)

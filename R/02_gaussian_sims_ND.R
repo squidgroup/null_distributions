@@ -23,7 +23,7 @@ perm_boot <- function(output, N_perm=100, N_boot=100){
   N_within <- output$N_within
 
 	perm <- do.call(rbind,lapply(1:N_perm,function(j){
-		data[,"ID"] <- sample(data[,"ID"], replace=FALSE)
+		data[,"ID"] <- sample(data[,ID], replace=FALSE)
 
 		c(gaussian_mods(data)$summary)
 	}))
