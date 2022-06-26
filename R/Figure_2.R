@@ -43,8 +43,16 @@ abs_bias<-aggregate(cbind(mode0.1_bias,mode1_bias,mean_bias,median_bias)~N_group
 accuracy<-aggregate(cbind(mode0.1_bias,mode1_bias,mean_bias,median_bias)~N_group+N_within+ICC,actual,sd)
 precision<-aggregate(cbind(mode0.1,mode1,mean,median)~N_group+N_within+ICC,actual,function(x)1/sd(x))
 
-plot(bias$mean_bias-bias$median_bias);abline(h=0)
+plot(bias$median_bias-bias$mean_bias);abline(h=0)
 plot(accuracy$mean_bias-accuracy$median_bias);abline(h=0)
+
+abs(actual$mean_bias) - abs(actual$median_bias)
+
+plot(aggregate(abs(mean_bias)-abs(median_bias)~N_group+N_within+ICC,actual,mean)[,4]);abline(h=0)
+
+plot(aggregate(abs(mode1_bias)-abs(median_bias)~N_group+N_within+ICC,actual,mean)[,4]);abline(h=0)
+plot(aggregate(abs(mode1_bias)-abs(mean_bias)~N_group+N_within+ICC,actual,mean)[,4]);abline(h=0)
+plot(aggregate(abs(mode1_bias)-abs(mode0.1_bias)~N_group+N_within+ICC,actual,mean)[,4]);abline(h=0)
 
 
 setEPS()
