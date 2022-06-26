@@ -14,12 +14,12 @@ wd <- "~/github/bayes_perm/"
 source(paste0(wd,"R/00_functions.R"))
 
 LMM_stan <- stan_model(file = paste0(wd,"stan/simple_LMM.stan"))
-pops <- 1:100
+pops <- 101:300
 sets <- expand.grid(ICC=c(0,0.1,0.2,0.4),N_group=c(20,40,80),N_within=c(2,4))
 N_boot=100
 
-for(j in 1:length(sets)){
-	cat("\n set:",as.matrix(sets[j,]), "\n")
+for(j in 4:nrow(sets)){
+	cat("\n set",j,":",as.matrix(sets[j,]), "\n")
 
 	file_end <- paste0(sets[j,"ICC"],"_",sets[j,"N_group"],"_",sets[j,"N_within"],".Rdata")
 	
@@ -28,13 +28,9 @@ for(j in 1:length(sets)){
 	boot_out <- mclapply(pops,function(i){
 		set.seed(paste0(i,paste(sets[j,c(2,3,1)], collapse="")))
 		cat(i, " ")
-		data <- out[[i]]$data
-	
-  	ICC <- out[[i]]$ICC
-	 	N_group <- out[[i]]$N_group
-	 	N_within <- out[[i]]$N_within
+
 		bs_dat_all<-simulate_population(
-			data_structure= make_structure(paste0("ID(",N_group,")"),repeat_obs=N_within),
+			data_structure= make_structure(paste0("ID(",out[[i]]$param[3],")"),repeat_obs=out[[i]]$param[4]),
 			parameters= list(residual=list(vcov=median(rowSums(out[[i]]$post)))),
 			n_pop=N_boot
 		)
@@ -45,10 +41,10 @@ for(j in 1:length(sets)){
 
 		}))
 
-	list(
-		param = out[[i]]$parameters,
-		actual=out[[i]]$summary,
-		bootstrap=bootstrap)
+		list(
+			param = out[[i]]$parameters,
+			actual=out[[i]]$summary,
+			bootstrap=bootstrap)
 
 	},mc.cores=8)
 

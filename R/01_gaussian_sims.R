@@ -45,7 +45,7 @@ for(ICC in ICCs){
 	for (j in 1:nrow(squid_dat$sample_param)){
 		dat <- get_sample_data(squid_dat, sample_set = j, list=TRUE)
 		param <- squid_dat$sample_param[j,]
-			cat("\n set:",ICC,param, "\n")
+			cat("\n set",j,":",ICC,param, "\n")
 		out <- mclapply(1:length(dat),function(i){
 			cat(i, " ")
 			out_mod<-gaussian_mods(dat[[i]])

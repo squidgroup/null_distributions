@@ -14,12 +14,12 @@ wd <- "~/github/bayes_perm/"
 source(paste0(wd,"R/00_functions.R"))
 
 LMM_stan <- stan_model(file = paste0(wd,"stan/simple_LMM.stan"))
-pops <- 1:100
+pops <- 101:300
 sets <- expand.grid(ICC=c(0,0.1,0.2,0.4),N_group=c(20,40,80),N_within=c(2,4))
 N_perm=100
 
 for(j in 1:nrow(sets)){
-	cat("\n set:",as.matrix(sets[j,]), "\n")
+	cat("\n set",j,":",as.matrix(sets[j,]), "\n")
 
 	file_end <- paste0(sets[j,"ICC"],"_",sets[j,"N_group"],"_",sets[j,"N_within"],".Rdata")
 	
