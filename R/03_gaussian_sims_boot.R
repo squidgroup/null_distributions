@@ -42,7 +42,7 @@ for(j in 4:nrow(sets)){
 		}))
 
 		list(
-			param = out[[i]]$parameters,
+			param = out[[i]]$param,
 			actual=out[[i]]$summary,
 			bootstrap=bootstrap)
 

@@ -23,8 +23,9 @@ list_names <- gsub("gaus_sims_|.Rdata","",results)
 actual<-as.data.frame(do.call(rbind,lapply(results, function(y){
 	load(paste0(wd,"Data/Intermediate/",y))
 	do.call(rbind,lapply(out, function(x){
-	  z <- c(ICC=x$ICC,N_group=x$N_group, N_within=x$N_within,x$summary)
-	  names(z) <- c("ICC","N_group","N_within","freq","mode0.1","mode1","median","mean","LCI","UCI","ESS")	
+	  z <- c(x$param,x$summary)
+	  # ICC=x$ICC,N_group=x$N_group, N_within=x$N_within
+	  names(z) <- c("pop","ICC","N_group","N_within","freq","mode0.1","mode1","median","mean","LCI","UCI","ESS")	
 	  z
 	}))
 } )))
