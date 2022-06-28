@@ -14,7 +14,7 @@ wd <- "~/github/bayes_perm/"
 source(paste0(wd,"R/00_functions.R"))
 
 LMM_stan <- stan_model(file = paste0(wd,"stan/simple_LMM.stan"))
-pops <- 101:300
+pops <- 301:500
 sets <- expand.grid(ICC=c(0,0.1,0.2,0.4),N_group=c(20,40,80),N_within=c(2,4))
 N_perm=100
 
