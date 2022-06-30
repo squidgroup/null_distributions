@@ -64,8 +64,8 @@ p_perm<-as.data.frame(do.call(rbind,lapply(results, function(i){
 
 p_boot<-as.data.frame(do.call(rbind,lapply(results_b, function(i){
   load(paste0(wd,"Data/Intermediate/",i))
-  t(sapply(boot_out[1:100], function(x){
-		c(x$param,
+  t(sapply(boot_out, function(x){
+		c(
 		freq_boot = p_func(x$actual["freq"],x$boot[,"freq"]),
 		mean_boot = p_func(x$actual["mean"],x$boot[,"mean"]),
 		median_boot = p_func(x$actual["median"],x$boot[,"median"]),
@@ -77,6 +77,10 @@ p_boot<-as.data.frame(do.call(rbind,lapply(results_b, function(i){
 		)
 	}))
 })))
+
+nrow(p_boot)
+nrow(p_perm)
+
 
 head(p_perm)
 head(p_boot)
