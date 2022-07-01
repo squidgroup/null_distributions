@@ -1,0 +1,188 @@
+---
+title: Results from Permutation Test and Bootstrap Simulations
+author: Joel Pick
+output: html_document
+---
+
+
+```{r,echo=FALSE}
+
+rm(list=ls())
+
+library(scales)
+library(beeswarm)
+
+wd <- "~/github/bayes_perm/"
+
+source(paste0(wd,"R/00_functions.R"))
+
+files <- list.files(paste0(wd,"Data/Intermediate"))
+results <- files[grep("gaus_perm",files)]
+list_names <- gsub("gaus_perm_|.Rdata","",results)
+
+results_b <- files[grep("gaus_boot",files)]
+list_names_b <- gsub("gaus_boot_|.Rdata","",results_b)
+
+p_perm<-as.data.frame(do.call(rbind,lapply(results, function(i){
+  load(paste0(wd,"Data/Intermediate/",i))
+  t(sapply(perm_out, function(x){
+		names(x$param) <-c("pop", "ICC", "N_group", "N_within")
+		c(x$param,
+		freq_perm = p_func(x$actual["freq"],x$perm[,"freq"]),
+		mean_perm = p_func(x$actual["mean"],x$perm[,"mean"]),
+		median_perm = p_func(x$actual["median"],x$perm[,"median"]),
+		mode0.1_perm = p_func(x$actual["mode0.1"],x$perm[,"mode0.1"]),
+		mode1_perm = p_func(x$actual["mode1"],x$perm[,"mode1"])
+		)
+	}))
+})))
+
+p_boot<-as.data.frame(do.call(rbind,lapply(results_b, function(i){
+  load(paste0(wd,"Data/Intermediate/",i))
+  t(sapply(boot_out, function(x){
+		c(
+		freq_boot = p_func(x$actual["freq"],x$boot[,"freq"]),
+		mean_boot = p_func(x$actual["mean"],x$boot[,"mean"]),
+		median_boot = p_func(x$actual["median"],x$boot[,"median"]),
+		mode0.1_boot = p_func(x$actual["mode0.1"],x$boot[,"mode0.1"]),
+		mode1_boot = p_func(x$actual["mode1"],x$boot[,"mode1"])
+		)
+	}))
+})))
+
+
+all<-cbind(p_perm,p_boot)
+
+
+pch=19
+cex=0.2
+col=alpha(1,0.3)
+```
+
+```{r,'perm-boot-plot',echo=FALSE, fig.height=6}
+## permutation to bootstrap p-values
+{par(mfrow=c(2,2))
+plot(mean_perm~mean_boot,all, pch=pch, cex=cex, col=col)
+abline(0,1, col="red")
+text(0.1,0.9,round(cor(all[,"mean_boot"],all[,"mean_perm"]),3))
+
+plot(median_perm~median_boot,all, pch=pch, cex=cex, col=col)
+abline(0,1, col="red")
+text(0.1,0.9,round(cor(all[,"median_boot"],all[,"median_perm"]),3))
+
+plot(mode1_perm~mode1_boot,all, pch=pch, cex=cex, col=col)
+abline(0,1, col="red")
+text(0.1,0.9,round(cor(all[,"mode1_boot"],all[,"mode1_perm"]),3))
+
+plot(mode0.1_perm~mode0.1_boot,all, pch=pch, cex=cex, col=col)
+abline(0,1, col="red")
+text(0.1,0.9,round(cor(all[,"mode0.1_boot"],all[,"mode0.1_perm"]),3))
+}
+```
+
+```{r,'diff-measures-plot',echo=FALSE, fig.height=12}
+# comparison between different measures
+{
+par(mfrow=c(4,2))
+plot(mean_boot~median_boot,all, pch=pch, cex=cex, col=col)
+abline(0,1, col="red")
+text(0.1,0.9,round(cor(all[,"mean_boot"],all[,"median_boot"]),3))
+plot(mean_perm~median_perm,all, pch=pch, cex=cex, col=col)
+abline(0,1, col="red")
+text(0.1,0.9,round(cor(all[,"mean_perm"],all[,"median_perm"]),3))
+
+plot(mean_boot~mode1_boot,all, pch=pch, cex=cex, col=col)
+abline(0,1, col="red")
+text(0.1,0.9,round(cor(all[,"mean_boot"],all[,"mode1_boot"]),3))
+plot(mean_perm~mode1_perm,all, pch=pch, cex=cex, col=col)
+abline(0,1, col="red")
+text(0.1,0.9,round(cor(all[,"mean_perm"],all[,"mode1_perm"]),3))
+
+
+plot(mean_boot~mode0.1_boot,all, pch=pch, cex=cex, col=col)
+abline(0,1, col="red")
+text(0.1,0.9,round(cor(all[,"mean_boot"],all[,"mode0.1_boot"]),3))
+plot(mean_perm~mode0.1_perm,all, pch=pch, cex=cex, col=col)
+abline(0,1, col="red")
+text(0.1,0.9,round(cor(all[,"mean_perm"],all[,"mode0.1_perm"]),3))
+
+
+
+plot(mode1_boot~mode0.1_boot,all, pch=pch, cex=cex, col=alpha(1:4,
+	0.3)[as.factor(all$N_group)])
+abline(0,1, col="red")
+text(0.1,0.9,round(cor(all[,"mode1_boot"],all[,"mode0.1_boot"]),3))
+plot(mode1_perm~mode0.1_perm,all, pch=pch, cex=cex, col=col)
+abline(0,1, col="red")
+text(0.1,0.9,round(cor(all[,"mode1_perm"],all[,"mode0.1_perm"]),3))
+
+}
+
+```
+
+```{r,'power-pb-plot',echo=FALSE, fig.height=12}
+
+{
+ICCs <- c(0,0.1,0.2,0.4)
+	power_dat <- aggregate(cbind(mode1_boot,mode0.1_boot,mean_boot,median_boot,median_perm)~N_group+ N_within+ICC,all,function(x) mean(x<=0.05))
+par(mfrow=c(2,1),mar=c(4,4,2,1), cex.axis=0.75, mgp=c(2,0.5,0))
+plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power",  ylim=c(0,1))
+abline(h=0.05, col="grey")
+abline(h=c(0.025,0.075), col="grey")
+for(j in seq_along(ICCs)){
+	points(median_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=19, type="b")
+		points(median_perm~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=18, type="b")
+
+	# points(mode0.1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=18, type="b")
+	# 	points(mode1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=17, type="b")
+
+	# lines(mean_boot~N_group,power_dat, subset=ICC==ICCs[j], col=j, lwd=2)
+}
+
+plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power",  ylim=c(0,1))
+abline(h=0.05, col="grey")
+abline(h=c(0.028,0.081), col="grey")
+for(j in seq_along(ICCs)){
+	points(median_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=19, type="b")
+		points(median_perm~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=18, type="b")
+
+		# points(mode0.1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=18, type="b")
+
+	# lines(mean_boot~N_group,power_dat, subset=ICC==ICCs[j], col=j, lwd=2)
+}
+}
+
+
+```
+
+```{r,'power-measures-plot',echo=FALSE, fig.height=12}
+{
+ICCs <- c(0,0.1,0.2,0.4)
+	power_dat <- aggregate(cbind(mode1_boot,mode0.1_boot,mean_boot,median_boot,median_perm)~N_group+ N_within+ICC,all,function(x) mean(x<=0.05))
+par(mfrow=c(2,1),mar=c(4,4,2,1), cex.axis=0.75, mgp=c(2,0.5,0))
+plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power",  ylim=c(0,1))
+abline(h=0.05, col="grey")
+abline(h=c(0.025,0.075), col="grey")
+for(j in seq_along(ICCs)){
+	points(mean_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=19, type="b")
+	points(median_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=18, type="b")
+	points(mode1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=17, type="b")
+	points(mode0.1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=15, type="b")
+
+	# lines(mean_boot~N_group,power_dat, subset=ICC==ICCs[j], col=j, lwd=2)
+}
+
+	plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power",  ylim=c(0,1))
+	abline(h=0.05, col="grey")
+	abline(h=c(0.028,0.081), col="grey")
+	for(j in seq_along(ICCs)){
+		points(mean_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=19, type="b")
+		points(median_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=18, type="b")
+		points(mode1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=17, type="b")
+		points(mode0.1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=15, type="b")
+	# lines(mean_boot~N_group,power_dat, subset=ICC==ICCs[j], col=j, lwd=2)
+	}
+}
+
+
+```

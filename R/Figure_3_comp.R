@@ -30,8 +30,6 @@ actual<-as.data.frame(do.call(rbind,lapply(results, function(y){
 	}))
 } )))
 
-actual<-subset(actual,N_group!=160)
-
 nrow(actual)
 
 actual$mean_bias<-actual$mean-actual$ICC
@@ -41,11 +39,14 @@ actual$mode0.1_bias<-actual$mode0.1-actual$ICC
 
 bias<-aggregate(cbind(mode0.1_bias,mode1_bias,mean_bias,median_bias)~N_group+N_within+ICC,actual,mean)
 abs_bias<-aggregate(cbind(mode0.1_bias,mode1_bias,mean_bias,median_bias)~N_group+N_within+ICC,actual,function(x) mean(abs(x)))
-accuracy<-aggregate(cbind(mode0.1_bias,mode1_bias,mean_bias,median_bias)~N_group+N_within+ICC,actual,sd)
+rmse<-aggregate(cbind(mode0.1_bias,mode1_bias,mean_bias,median_bias)~N_group+N_within+ICC,actual,function(x) sqrt(mean(x^2)) )
+# accuracy<-aggregate(cbind(mode0.1_bias,mode1_bias,mean_bias,median_bias)~N_group+N_within+ICC,actual,sd)
 precision<-aggregate(cbind(mode0.1,mode1,mean,median)~N_group+N_within+ICC,actual,function(x)1/sd(x))
 
 plot(bias$median_bias-bias$mean_bias);abline(h=0)
-plot(accuracy$mean_bias-accuracy$median_bias);abline(h=0)
+plot(rmse$mean_bias-rmse$median_bias);abline(h=0)
+plot(rmse$mode1_bias-rmse$median_bias);abline(h=0)
+plot(rmse$mode1_bias-rmse$mean_bias);abline(h=0)
 
 abs(actual$mean_bias) - abs(actual$median_bias)
 
@@ -83,11 +84,11 @@ points(abs_bias$mode0.1_bias, pch=19,col="green")
 	abline(v=line_coords)
 axis(1,1:24,rep(c(20,40,80,160),6))
 
-plot(accuracy$mean_bias, pch=19, ylim=c(0,0.4), ylab="RMSE", xaxt="n")
+plot(rmse$mean_bias, pch=19, ylim=c(0,0.4), ylab="RMSE", xaxt="n")
 abline(h=0)
-points(accuracy$median_bias, pch=19,col="red")
-points(accuracy$mode1_bias, pch=19,col="blue")
-points(accuracy$mode0.1_bias, pch=19,col="green")
+points(rmse$median_bias, pch=19,col="red")
+points(rmse$mode1_bias, pch=19,col="blue")
+points(rmse$mode0.1_bias, pch=19,col="green")
 	abline(v=line_coords)
 axis(1:24,rep(c(20,40,80,160),4))
 axis(1,1:24,rep(c(20,40,80,160),6))

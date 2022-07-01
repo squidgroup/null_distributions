@@ -70,5 +70,5 @@ stan_out_RR <- function(model){
 
 print_func <- function(x) {
 	x<-round(x,3)
-	paste0(x["mean"]," (",x["mode"],") \n [",x["LCI"],",",x["UCI"],"]")
+	paste0(x["mean"]," (",x["mode1"],") \n [",x["LCI"],",",x["UCI"],"]")
 }
