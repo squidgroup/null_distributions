@@ -197,3 +197,25 @@ for(j in seq_along(ICCs)){
 
 
 ```
+
+
+
+```{r, echo=FALSE}
+
+
+within_groups <- c(2,4)
+Ns <- c(20,40,80)
+ICCs <- c(0.1,0.2,0.4)
+
+
+for(i in ICCs){
+	for(j in Ns){
+		for(k in within_groups){
+			null <- subset(actual, ICC==0 & N_within==k & N_group==j)$median
+			alt <- subset(actual, N_within==k & N_group==j & ICC==i)$median
+			power_dist<- rbind(power_dist,c(ICC=i, N_group=j, N_within=k, power=mean(sapply(alt, function(x) p_func(x,null))<0.05)))
+		}
+	}
+}
+power_dist <- as.data.frame(power_dist)
+```
