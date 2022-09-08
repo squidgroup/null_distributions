@@ -4,7 +4,7 @@ library(beeswarm)
 library(scales)
 wd <- "~/github/bayes_perm/"
 
-source(paste0(wd,"R/functions.R"))
+source(paste0(wd,"R/00_functions.R"))
 
 
 load( file=paste0(wd,"Data/Intermediate/RR_sim.Rdata"))
