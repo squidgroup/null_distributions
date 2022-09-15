@@ -51,9 +51,12 @@ abs_bias<-aggregate(cbind(freq_bias,mode0.1_bias,mode1_bias,mean_bias,median_bia
 # plot(abs_bias$mode0.1_bias,rmse$mode0.1_bias);abline(0,1)
 # plot(abs_bias$freq_bias,rmse$freq_bias);abline(0,1)
 
+setEPS()
+pdf(paste0(wd,"Figures/FigSM_freq.pdf"), height=4, width=11)
+{
 
-line_coords <- (1:7)*3+0.5
-	par(mfrow=c(4,1), mar=c(2,4,3,1))
+{line_coords <- (1:7)*3+0.5
+	par(mfrow=c(1,1), mar=c(2,4,3,1))
 
 plot(bias$mean_bias, pch=19, ylim=c(-0.2,0.2), ylab="Bias", xaxt="n")
 abline(h=0)
@@ -63,38 +66,10 @@ points(bias$median_bias, pch=19,col="red")
 points(bias$mode1_bias, pch=19,col="blue")
 points(bias$mode0.1_bias, pch=19,col="green")
 	abline(v=line_coords)
-axis(1,1:24,rep(c(20,40,80,160),6))
+axis(1,1:24,rep(c(20,40,80),8))
 
 mtext(c("","0","","0.1","","0.2","","0.4",""),side=3,adj=c(seq(0,1,length.out=9)),line=1)
 mtext(c("","2","4","2","4","2","4","2","4"),side=3,adj=c(seq(0,1,length.out=9)-1/16))
-legend("bottomleft",c("mean","median","mode-0.1","mode-1"), pch=19, col=c(1,2,3,4))
-
-plot(abs_bias$mean_bias, pch=19, ylim=c(0,0.4), ylab="Absolute Bias", xaxt="n")
-abline(h=0)
-points(abs_bias$freq_bias, pch=19,col="purple")
-points(abs_bias$median_bias, pch=19,col="red")
-points(abs_bias$mode1_bias, pch=19,col="blue")
-points(abs_bias$mode0.1_bias, pch=19,col="green")
-	abline(v=line_coords)
-axis(1,1:24,rep(c(20,40,80,160),6))
-
-
-
-plot(rmse$mean_bias, pch=19, ylim=c(0,0.4), ylab="Root mean squared error", xaxt="n")
-abline(h=0)
-points(rmse$freq_bias, pch=19,col="purple")
-points(rmse$median_bias, pch=19,col="red")
-points(rmse$mode1_bias, pch=19,col="blue")
-points(rmse$mode0.1_bias, pch=19,col="green")
-	abline(v=line_coords)
-axis(1,1:24,rep(c(20,40,80,160),6))
-
-
-plot(rmse2$mean_bias, pch=19, ylim=c(0,0.4), ylab="Root mean squared error", xaxt="n")
-abline(h=0)
-points(rmse2$freq_bias, pch=19,col="purple")
-points(rmse2$median_bias, pch=19,col="red")
-points(rmse2$mode1_bias, pch=19,col="blue")
-points(rmse2$mode0.1_bias, pch=19,col="green")
-	abline(v=line_coords)
-axis(1,1:24,rep(c(20,40,80,160),6))
+legend("bottomleft",c("mean","median","mode-0.1","mode-1","freq"), pch=19, col=c(1,2,3,4,"purple"))
+}
+dev.off()

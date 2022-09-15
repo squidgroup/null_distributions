@@ -90,13 +90,20 @@ hist(subset(actual, ICC==0.1 & N_within==2 & N_group==40)$median)
 hist(subset(actual, ICC==0.1 & N_within==2 & N_group==80)$median)
 
 
+
+setEPS()
+pdf(paste0(wd,"Figures/Fig6_power.pdf"), height=5, width=10)
+
 {
 ICCs <- c(0,0.1,0.2,0.4)
 	power_dat <- aggregate(cbind(mode1_boot,mode0.1_boot,mean_boot,median_boot,median_perm)~N_group+ N_within+ICC,all,function(x) mean(x<0.05))
 par(mfrow=c(1,2),mar=c(4,4,2,1), cex.axis=0.75, mgp=c(2,0.5,0))
 plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power",  ylim=c(0,1),)
 abline(h=0.05, col="grey")
-legend("topleft",c("power","perm","boot","ICC=0","ICC=0.1","ICC=0.2","ICC=0.4"), pch=c(17,18,19,rep(NA,4)), col=c("grey","grey","grey",1:4),pt.bg=c("grey"), lty=c(0,0,0,1,1,1,1),lwd=2)
+# legend("topleft",c("power","perm","boot","ICC=0","ICC=0.1","ICC=0.2","ICC=0.4"), pch=c(17,18,19,rep(NA,4)), col=c("grey","grey","grey",1:4),pt.bg=c("grey"), lty=c(0,0,0,1,1,1,1),lwd=2)
+ legend("topleft",c("power","perm","boot"), pch=c(17,18,19), col="grey",pt.bg=c("grey"), bty="n")
+	# mtext("a)",3,line=1,adj=0)
+mtext("a)",2,padj=-15, las=1, line=2)
 
 # abline(h=c(0.025,0.075), col="grey")
 for(j in seq_along(ICCs)){
@@ -104,6 +111,8 @@ for(j in seq_along(ICCs)){
 	points(median_perm~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=18, type="b")
 		points(power~N_group,power_dist, subset=ICC==ICCs[j]&N_within==2, col=j, pch=17, type="b")
 }
+
+text(rep(65,4),c(0.1,0.25,0.55,0.97),c("ICC=0","ICC=0.1","ICC=0.2","ICC=0.4"), col=1:4)
 
 plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power",  ylim=c(0,1))
 abline(h=0.05, col="grey")
@@ -113,4 +122,8 @@ for(j in seq_along(ICCs)){
 		points(median_perm~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=18, type="b")
 		points(power~N_group,power_dist, subset=ICC==ICCs[j]&N_within==4, col=j, pch=17, type="b")
 }
+mtext("b)",2,padj=-15, las=1, line=2)
+
+
 }
+dev.off()

@@ -9,7 +9,7 @@ wd <- "~/github/bayes_perm/"
 
 source(paste0(wd,"R/00_functions.R"))
 
-run_sims<- TRUE
+run_sims<- FALSE
 
 if(run_sims){
 	sim_dat <- simulate_population(
@@ -71,18 +71,3 @@ if(run_sims){
 
 	save(results, file=paste0(wd,"Data/Intermediate/fay_results.Rdata"))
 }
-load(paste0(wd,"Data/Intermediate/fay_results.Rdata"))
-
-# results_sum <- t(sapply(results,colMeans))
- results_sum <- t(sapply(results,function(x)colMeans(sqrt(x))))
-# results_sum <- t(sapply(results,function(x)apply(x,2,median)))
-
-plot(results_sum[,"n"],results_sum[,"mean"], ylim=c(0,0.5), type="b")
-points(results_sum[,"n"],results_sum[,"median"], type="b")
-points(results_sum[,"n"],results_sum[,"mode1"], type="b")
-points(results_sum[,"n"],results_sum[,"mode0.1"], type="b")
-abline(h=0.2, col="grey")
-
-
-boxplot(ESS~n,do.call(rbind,lapply(results,function(x) x[,c("n","ESS")])))
-

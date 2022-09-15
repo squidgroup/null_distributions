@@ -1,0 +1,62 @@
+rm(list=ls())
+
+library("beeswarm")
+
+library(scales)
+wd <- "~/github/bayes_perm/"
+
+source(paste0(wd,"R/00_functions.R"))
+
+files <- list.files(paste0(wd,"Data/Intermediate"))
+results <- files[grep("gaus_sims",files)]
+list_names <- gsub("gaus_sims_|.Rdata","",results)
+
+## get all results into a list
+# all <- list()
+# for(i in 1:length(results)){
+# 	load(paste0(wd,"Data/Intermediate/",results[i]))
+# 	all[[list_names[i]]] <- out
+# 	rm("out")
+# }
+
+actual<-as.data.frame(do.call(rbind,lapply(results, function(y){
+	load(paste0(wd,"Data/Intermediate/",y))
+	do.call(rbind,lapply(out, function(x){
+	  z <- c(x$param,x$summary)
+	  # ICC=x$ICC,N_group=x$N_group, N_within=x$N_within
+	  names(z) <- c("pop","ICC","N_group","N_within","freq","mode0.1","mode1","median","mean","LCI","UCI","ESS")	
+	  z
+	}))
+} )))
+
+nrow(actual)
+
+precision<-aggregate(cbind(mode0.1,mode1,mean,median)~ICC+N_group+N_within,actual,function(x)1/sd(x))
+
+line_coords <- (1:5)*4+0.5
+
+setEPS()
+pdf(paste0(wd,"Figures/FigSM_precision.pdf"), height=5, width=11)
+{
+
+# line_coords <- (1:7)*3+0.5
+par(mfrow=c(1,1), mar=c(4,4,4,1))
+
+plot(precision$mean, pch=19, ylim=c(0,70), ylab="Precision", xlab="ICC", xaxt="n")
+abline(h=0)
+abline(v=line_coords, lty=c(2,2,1,2,2))
+# axis(1,1:24,rep(c(0,0.1,0.2,0.4),6))
+axis(3,(1:6) *4 -1.5,rep(c(20,40,80),2), tick=FALSE, line=-0.5)
+axis(3,(1:3) *4 -1.5,c("",2,""), lwd.ticks=0, line=2, padj=1)
+axis(3,(4:6) *4 -1.5,c("",4,""), lwd.ticks=0, line=2, padj=1)
+
+points(precision$median, pch=19,col="red")
+points(precision$mode1, pch=19,col="blue")
+points(precision$mode0.1, pch=19,col="green")
+
+ axis(1,1:24,rep(c(0,0.1,0.2,0.4),6))
+ legend("topleft",c("mean","median","mode-0.1","mode-1"), pch=19, col=c(1,2,3,4), bty="n")
+
+}
+
+dev.off()

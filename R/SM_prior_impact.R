@@ -1,6 +1,8 @@
 
 rm(list=ls())
 
+run=FALSE
+
 devtools::load_all("~/github/squidSim/R")
 
 options(mc.cores = parallel::detectCores())
@@ -75,7 +77,7 @@ prior_sim <- function(N_pop, ICC, N_group, N_within, mc.cores=4){
 	return(dist_M)
 }
 
-
+if(run){
 out<-prior_sim(N_pop=500, ICC=0.2, N_group=80, N_within=2, mc.cores=8)
 
 subset(out2)
@@ -109,7 +111,7 @@ apply(diffs,1,var)
 aggregate(estimate~prior+type,out2,mean)
 
 save(out, file=paste0(wd,"Data/Intermediate/prior_impact.Rdata"))
-
+}
 load(paste0(wd,"Data/Intermediate/prior_impact.Rdata"))
 
 out2<-do.call(rbind,out)
@@ -117,14 +119,15 @@ head(out2,20)
 library("beeswarm")
 	beeswarm(estimate~prior+type,out2, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap", ylab="Estimate")
 
+setEPS()
+pdf(paste0(wd,"Figures/FigSM_prior.pdf"), height=9, width=9)
 {
 par(mfrow=c(2,2))
 	beeswarm(estimate~prior,subset(out2,type=="mode0.1"), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Uniform(0,2)"), ylab="Estimate", main="Mode: scale= 0.1")
-	beeswarm(estimate~prior,subset(out2,type=="mode1"), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Uniform(0,2)"), ylab="Estimate", main="Mode: scale= 0.1")
+	beeswarm(estimate~prior,subset(out2,type=="mode1"), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Uniform(0,2)"), ylab="Estimate", main="Mode: scale= 1")
 	beeswarm(estimate~prior,subset(out2,type=="mean"), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Uniform(0,2)"), ylab="Estimate", main="Mean")
 	beeswarm(estimate~prior,subset(out2,type=="median"), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Uniform(0,2)"), ylab="Estimate", main="Median")
 }
+dev.off()
 
 
-
-lapply(out,funtion(x) x)
