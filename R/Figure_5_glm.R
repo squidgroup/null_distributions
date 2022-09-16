@@ -67,9 +67,9 @@ setEPS()
 pdf(paste0(wd,"Figures/Fig5_glmm.pdf"), height=6, width=8)
 
 {
-par(mfrow=c(2,1), mar=c(4,4,2,1), cex.axis=0.75, mgp=c(2,0.5,0))
+par(mfrow=c(2,1), mar=c(1,4,3,1), cex.axis=0.75, mgp=c(2,0.5,0))
 # boxplot(estimate~N_within+type,bp2_long,boxwex=0.5,xlab="Within group sample size", names=rep(c(2,4,8),3), ylab="Estimate", pch=19, cex=0.5)
-beeswarm(estimate~sim_var+type,long, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Between group variance", ylab="Estimate", labels=rep(c(0,0.2),4))#, 
+beeswarm(estimate~sim_var+type,long, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="", ylab="Estimate", labels=rep(c(0,0.2),4), xaxt="n")#, 
 mtext(c("Post. Mean","Post. Median","Post. Mode 1","Post. Mode 0.1"),side=3,adj=c(0.1,0.35,0.65 ,0.9))
 means<-aggregate(estimate~sim_var+type,long,mean)$estimate
 CIs<-aggregate(estimate~sim_var+type,long,function(x) sd(x)/sqrt(length(x)))$estimate*qnorm(0.975)
@@ -81,28 +81,12 @@ abline(v=c(2.5,4.5,6.5))
 # mtext(c("ML","Posterior Mean","Posterior Mode"),side=3,adj=c(0.15,0.5, 0.85))
 mtext("a)",2,padj=-8, las=1, line=2)
 
-
-beeswarm(estimate~sim_var+type,p_long_boot, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Between group variance", ylab=bquote(P[perm]), labels=rep(c(0,0.2),4))#, labels=c("ML","Posterior Mean","Posterior Median","Posterior Mode"))
+par(mar=c(3,4,1,1))
+beeswarm(estimate~sim_var+type,p_long_boot, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Between group variance", ylab="p-value", labels=rep(c(0,0.2),4))#, labels=c("ML","Posterior Mean","Posterior Median","Posterior Mode"))
 # boxplot(estimate~sim_var+type,p_long, pch=19, cex=0.5,xlab="Between group variance", ylab=bquote(P[perm]),boxwex=0.5, names=rep(c(0,0.2),4))#, 
 abline(v=c(2.5,4.5,6.5))
-mtext(c("Post. Mean","Post. Median","Post. Mode 1","Post. Mode 0.1"),side=3,adj=c(0.1,0.35,0.65 ,0.9))
 mtext("b)",2,padj=-8, las=1, line=2)
 
 }
 
 dev.off()
-
-
-p <- rbind(p_null,p_alt)
-par(mfrow=c(2,2))
-plot(mean_perm~mean_boot,p); abline(0,1, col="red")
-plot(median_perm~median_boot,p); abline(0,1, col="red")
-plot(mode1_perm~mode1_boot,p); abline(0,1, col="red")
-plot(mode0.1_perm~mode0.1_boot,p); abline(0,1, col="red")
-
-par(mfrow=c(2,2))
-plot(mean_boot~median_boot,p); abline(0,1, col="red")
-plot(mean_boot~mode1_boot,p); abline(0,1, col="red")
-plot(mean_boot~mode0.1_boot,p); abline(0,1, col="red")
-plot(mode1_boot~mode0.1_boot,p); abline(0,1, col="red")
-
