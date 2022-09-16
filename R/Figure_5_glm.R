@@ -62,6 +62,7 @@ p_long_boot <- rbind(p_long_alt_boot,p_long_null_boot)
 p_long_perm <- rbind(p_long_alt_perm,p_long_null_perm)
 
 
+
 setEPS()
 pdf(paste0(wd,"Figures/Fig5_glmm.pdf"), height=6, width=8)
 
@@ -81,7 +82,7 @@ abline(v=c(2.5,4.5,6.5))
 mtext("a)",2,padj=-8, las=1, line=2)
 
 
-beeswarm(estimate~sim_var+type,p_long_perm, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Between group variance", ylab=bquote(P[perm]), labels=rep(c(0,0.2),4))#, labels=c("ML","Posterior Mean","Posterior Median","Posterior Mode"))
+beeswarm(estimate~sim_var+type,p_long_boot, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Between group variance", ylab=bquote(P[perm]), labels=rep(c(0,0.2),4))#, labels=c("ML","Posterior Mean","Posterior Median","Posterior Mode"))
 # boxplot(estimate~sim_var+type,p_long, pch=19, cex=0.5,xlab="Between group variance", ylab=bquote(P[perm]),boxwex=0.5, names=rep(c(0,0.2),4))#, 
 abline(v=c(2.5,4.5,6.5))
 mtext(c("Post. Mean","Post. Median","Post. Mode 1","Post. Mode 0.1"),side=3,adj=c(0.1,0.35,0.65 ,0.9))
@@ -90,3 +91,18 @@ mtext("b)",2,padj=-8, las=1, line=2)
 }
 
 dev.off()
+
+
+p <- rbind(p_null,p_alt)
+par(mfrow=c(2,2))
+plot(mean_perm~mean_boot,p); abline(0,1, col="red")
+plot(median_perm~median_boot,p); abline(0,1, col="red")
+plot(mode1_perm~mode1_boot,p); abline(0,1, col="red")
+plot(mode0.1_perm~mode0.1_boot,p); abline(0,1, col="red")
+
+par(mfrow=c(2,2))
+plot(mean_boot~median_boot,p); abline(0,1, col="red")
+plot(mean_boot~mode1_boot,p); abline(0,1, col="red")
+plot(mean_boot~mode0.1_boot,p); abline(0,1, col="red")
+plot(mode1_boot~mode0.1_boot,p); abline(0,1, col="red")
+
