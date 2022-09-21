@@ -177,12 +177,13 @@ mtext("a)",2,padj=-9.5, las=1, line=3)
 # axis(3,(1:3) *4 -1.5,c("",2,""), lwd.ticks=0, line=2, padj=1, cex.axis=1.25)
 # axis(3,(4:6) *4 -1.5,c("",4,""), lwd.ticks=0, line=2, padj=1, cex.axis=1.25)
 
-axis(3,1:8 *3 -1,rep(c(2,4),4), tick=FALSE, line=-0.5, cex.axis=1.25)
+# axis(3,1:8 *3 -1,rep(c(2,4),4), tick=FALSE, line=-0.5, cex.axis=1.25)
 
-axis(3,c(2,3.5,5),c("",0,""), lwd.ticks=0, line=2, padj=1, cex.axis=1.25)
-axis(3,c(2,3.5,5) + 6,c("",0.1,""), lwd.ticks=0, line=2, padj=1, cex.axis=1.25)
-axis(3,c(2,3.5,5) + 12,c("",0.2,""), lwd.ticks=0, line=2, padj=1, cex.axis=1.25)
-axis(3,c(2,3.5,5) + 18,c("",0.4,""), lwd.ticks=0, line=2, padj=1, cex.axis=1.25)
+axis(3,c(1,3.5,6),c("",0,""), lwd.ticks=0, line=1, padj=1, cex.axis=1.25)
+axis(3,c(1,3.5,6) + 6,c("",0.1,""), lwd.ticks=0, line=1, padj=1, cex.axis=1.25)
+axis(3,c(1,3.5,6) + 12,c("",0.2,""), lwd.ticks=0, line=1, padj=1, cex.axis=1.25)
+axis(3,c(1,3.5,6) + 18,c("",0.4,""), lwd.ticks=0, line=1, padj=1, cex.axis=1.25)
+mtext("ICC", side=3, line=-3, outer=TRUE, adj=0.05)
 
 # mtext(c("","0","","0.1","","0.2","","0.4",""),side=3,adj=c(seq(0,1,length.out=9)),line=1)
 # mtext(c("","2","4","2","4","2","4","2","4"),side=3,adj=c(seq(0,1,length.out=9)-1/16))
@@ -199,13 +200,11 @@ points(relative_bias$mode0.1_rel_bias*100, cex=pt.cex,pch=18,col="green")
 axis(4)
 mtext("b)",2,padj=-9.5, las=1, line=3)
 
-legend("topright",c("mean","median","mode-0.1","mode-1"), cex=1.25,pch=c(19,17,15,18), col=c(1,2,3,4))
-
 
 
 par(mar=c(4,5,0,2.5))
 
-plot(abs_rel_bias$mean_rel_bias*100, cex=pt.cex,pch=19, ylim=c(0,150), ylab="Absolute Relative Bias (%)", xaxt="n", xlab="ICC")
+plot(abs_rel_bias$mean_rel_bias*100, cex=pt.cex,pch=19, ylim=c(0,150), ylab="Absolute Relative Bias (%)", xaxt="n", xlab="")
 abline(h=0)
 abline(v=line_coords, lty=line_lty)
 points(abs_rel_bias$median_rel_bias*100, cex=pt.cex,pch=17,col="red")
@@ -215,11 +214,19 @@ axis(4)
 mtext("c)",2,padj=-9.5, las=1, line=3)
 
 
-dev.off()
+legend("topleft",c("mean","median","mode-0.1","mode-1"), cex=1.25,pch=c(19,17,15,18), col=c(1,2,3,4), bty="n")
+
 
 
 # axis(1,1:24,rep(c(0,0.1,0.2,0.4),6), cex.axis=1.2)
 axis(1,1:24,rep(c(20,40,80),8), cex.axis=1.2)
+axis(1,1:8 *3 -1,rep(c(2,4),4), tick=FALSE, line=1.5, cex.axis=1.25)
 
+mtext("N between", side=1, line=-3, outer=TRUE, adj=0)
+mtext("N within", side=1, line=-1.5, outer=TRUE, adj=0)
 
 }
+dev.off()
+
+
+
