@@ -55,7 +55,7 @@ setEPS()
 pdf(paste0(wd,"Figures/FigSM_freq.pdf"), height=4, width=11)
 {
 
-{line_coords <- (1:7)*3+0.5
+line_coords <- (1:7)*3+0.5
 	par(mfrow=c(1,1), mar=c(2,4,3,1))
 
 plot(bias$mean_bias, pch=19, ylim=c(-0.2,0.2), ylab="Bias", xaxt="n")

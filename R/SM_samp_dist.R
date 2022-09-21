@@ -30,63 +30,64 @@ actual<-as.data.frame(do.call(rbind,lapply(results, function(y){
 	}))
 } )))
 
-nrow(actual)
+agg <- aggregate(cbind(mean,median,mode1,mode0.1)~N_group+N_within+ICC,actual,mean)
 
-actual$mean_bias<-actual$mean-actual$ICC
-actual$median_bias<-actual$median-actual$ICC
-actual$mode1_bias<-actual$mode1-actual$ICC
-actual$mode0.1_bias<-actual$mode0.1-actual$ICC
-
-bias<-aggregate(cbind(mode0.1_bias,mode1_bias,mean_bias,median_bias)~ICC+N_group+N_within,actual,mean)
-abs_bias<-aggregate(cbind(mode0.1_bias,mode1_bias,mean_bias,median_bias)~ICC+N_group+N_within,actual,function(x) mean(abs(x)))
-rmse<-aggregate(cbind(mode0.1_bias,mode1_bias,mean_bias,median_bias)~ICC+N_group+N_within,actual,function(x) sqrt(mean(x^2)) )
-# accuracy<-aggregate(cbind(mode0.1_bias,mode1_bias,mean_bias,median_bias)~ICC+N_group+N_within,actual,sd)
-precision<-aggregate(cbind(mode0.1,mode1,mean,median)~ICC+N_group+N_within,actual,function(x)1/sd(x))
-
-
-agg <- aggregate(cbind(mean,median,mode1,mode0.1)~ICC+N_group+N_within,actual,mean)
-
-line_coords <- (1:5)*4+0.5
+line_coords <- (1:7)*3+0.5
+line_lty <- c(2,1,2,1,2,1,2)
 
 setEPS()
 pdf(paste0(wd,"Figures/FigSM_samp_dist.pdf"), height=8, width=12)
 {
 par(mfrow=c(4,1), mar=c(0,4,4.5,0))
-beeswarm(mean~ICC+N_group+N_within,actual, pch=19, cex=0.1, col=alpha(1,0.3),method = "compactswarm",corral="wrap",labels=rep(c(0,0.1,0.2,0.4)), ylab="Posterior Mean",  ylim=c(0,1))
+beeswarm(mean~N_group+N_within+ICC,actual, pch=19, cex=0.1, col=alpha(1,0.3),method = "compactswarm",corral="wrap",labels=c(20,40,80), ylab="Posterior Mean",  ylim=c(0,1))
 # abline(h=0)
-points(agg$mean, pch=19, col="blue")
-points(agg$ICC, pch=19, col="red")
+points(agg$mean, pch=19, col="orange")
+# points(agg$ICC, pch="-", col="red")
+arrows(1:24 -0.2,agg$ICC,1:24 +0.2,agg$ICC,code=0,col="red")
 
-abline(v=line_coords, lty=c(2,2,1,2,2))
+
+abline(v=line_coords, lty=line_lty)
 # axis(1,1:24,rep(c(0,0.1,0.2,0.4),6))
-axis(3,(1:6) *4 -1.5,rep(c(20,40,80),2), tick=FALSE, line=-0.5)
-axis(3,(1:3) *4 -1.5,c("",2,""), lwd.ticks=0, line=2, padj=1)
-axis(3,(4:6) *4 -1.5,c("",4,""), lwd.ticks=0, line=2, padj=1)
+# axis(3,(1:6) *4 -1.5,rep(c(20,40,80),2), tick=FALSE, line=-0.5)
+# axis(3,(1:3) *4 -1.5,c("",2,""), lwd.ticks=0, line=2, padj=1)
+# axis(3,(4:6) *4 -1.5,c("",4,""), lwd.ticks=0, line=2, padj=1)
+
+axis(3,1:8 *3 -1,rep(c(2,4),4), tick=FALSE, line=-0.5, cex.axis=1.25)
+
+axis(3,c(2,3.5,5),c("",0,""), lwd.ticks=0, line=2, padj=1, cex.axis=1.25)
+axis(3,c(2,3.5,5) + 6,c("",0.1,""), lwd.ticks=0, line=2, padj=1, cex.axis=1.25)
+axis(3,c(2,3.5,5) + 12,c("",0.2,""), lwd.ticks=0, line=2, padj=1, cex.axis=1.25)
+axis(3,c(2,3.5,5) + 18,c("",0.4,""), lwd.ticks=0, line=2, padj=1, cex.axis=1.25)
+
 
 
 par( mar=c(1.5,4,3,0))
 
-beeswarm(median~ICC+N_group+N_within,actual, pch=19, cex=0.1, col=alpha(1,0.3),method = "compactswarm",corral="wrap",labels=rep(c(0,0.1,0.2,0.4)), ylab="Posterior Median",  ylim=c(0,1))
+beeswarm(median~N_group+N_within+ICC,actual, pch=19, cex=0.1, col=alpha(1,0.3),method = "compactswarm",corral="wrap",labels=c(20,40,80), ylab="Posterior Median",  ylim=c(0,1))
 # abline(h=0)
-points(agg$median, pch=19, col="blue")
-points(agg$ICC, pch=19, col="red")
-abline(v=line_coords, lty=c(2,2,1,2,2))
+points(agg$median, pch=19, col="orange")
+# points(agg$ICC, pch="-", col="red")
+arrows(1:24 -0.2,agg$ICC,1:24 +0.2,agg$ICC,code=0,col="red")
+abline(v=line_coords, lty=line_lty)
 
 par( mar=c(3,4,1.5,0))
 
-beeswarm(mode1~ICC+N_group+N_within,actual, pch=19, cex=0.1, col=alpha(1,0.3),method = "compactswarm",corral="wrap",labels=rep(c(0,0.1,0.2,0.4)), ylab="Posterior Mode (adjust=1)",  ylim=c(0,1))
+beeswarm(mode1~N_group+N_within+ICC,actual, pch=19, cex=0.1, col=alpha(1,0.3),method = "compactswarm",corral="wrap",labels=c(20,40,80), ylab="Posterior Mode (adjust=1)",  ylim=c(0,1))
 # abline(h=0)
-points(agg$mode1, pch=19, col="blue")
-points(agg$ICC, pch=19, col="red")
-abline(v=line_coords, lty=c(2,2,1,2,2))
+points(agg$mode1, pch=19, col="orange")
+# points(agg$ICC, pch="-", col="red")
+arrows(1:24 -0.2,agg$ICC,1:24 +0.2,agg$ICC,code=0,col="red")
+abline(v=line_coords, lty=line_lty)
 
 par( mar=c(4.5,4,0,0))
 
-beeswarm(mode0.1~ICC+N_group+N_within,actual, pch=19, cex=0.1, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="ICC", ylab="Posterior Mode (adjust=0.1",  ylim=c(0,1),labels=rep(c(0,0.1,0.2,0.4),3))
+beeswarm(mode0.1~N_group+N_within+ICC,actual, pch=19, cex=0.1, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="ICC", ylab="Posterior Mode (adjust=0.1",  ylim=c(0,1),labels=c(20,40,80))
 # abline(h=0)
-points(agg$mode0.1, pch=19, col="blue")
-points(agg$ICC, pch=19, col="red")
-abline(v=line_coords, lty=c(2,2,1,2,2))
+points(agg$mode0.1, pch=19, col="orange")
+# points(agg$ICC, pch="-", col="red")
+arrows(1:24 -0.2,agg$ICC,1:24 +0.2,agg$ICC,code=0,col="red")
+
+abline(v=line_coords, lty=line_lty)
 
 }
 
