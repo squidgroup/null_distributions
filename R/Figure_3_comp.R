@@ -199,7 +199,7 @@ points(relative_bias$mode0.1_rel_bias*100, cex=pt.cex,pch=18,col="green")
 axis(4)
 mtext("b)",2,padj=-9.5, las=1, line=3)
 
-legend("topright",c("mean","median","mode-0.1","mode-1"), cex=1.25,pch=19, col=c(1,2,3,4))
+legend("topright",c("mean","median","mode-0.1","mode-1"), cex=1.25,pch=c(19,17,15,18), col=c(1,2,3,4))
 
 
 

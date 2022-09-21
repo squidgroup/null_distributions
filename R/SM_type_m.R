@@ -37,6 +37,7 @@ p_perm<-as.data.frame(do.call(rbind,lapply(results_p, function(i){
 		mean = as.numeric(x$actual["mean"]),
 		median = as.numeric(x$actual["median"]),
 		mode1 = as.numeric(x$actual["mode1"]),
+		mode0.1 = as.numeric(x$actual["mode0.1"]),
 		mean_median_dif = as.numeric(x$actual["mean"] - x$actual["median"]),
 		mean_mode_dif = as.numeric(x$actual["mean"] - x$actual["mode1"]),
 		freq_perm = p_func(x$actual["freq"],x$perm[,"freq"]),
@@ -58,7 +59,6 @@ p_boot<-as.data.frame(do.call(rbind,lapply(results_b, function(i){
   load(paste0(wd,"Data/Intermediate/",i))
   t(sapply(boot_out, function(x){
 		c(
-		freq_boot = p_func(x$actual["freq"],x$boot[,"freq"]),
 		mean_boot = p_func(x$actual["mean"],x$boot[,"mean"]),
 		median_boot = p_func(x$actual["median"],x$boot[,"median"]),
 		mode0.1_boot = p_func(x$actual["mode0.1"],x$boot[,"mode0.1"]),
@@ -77,47 +77,19 @@ col=alpha(1,0.3)
 
 
 ICCs <- c(0,0.1,0.2,0.4)
-power_dat <- aggregate(cbind(median_perm, mean_perm, mode1_perm)~N_group+ N_within+ICC,all,function(x) mean(x<0.05))
+power_dat <- aggregate(cbind(median_boot, mean_boot, mode1_boot,mode0.1_boot)~N_group+ N_within+ICC,all,function(x) mean(x<0.05))
 
-type_median <- aggregate(median~N_group+ N_within+ICC,subset(p_perm,median_perm<0.05),mean)
-type_mean <- aggregate(mean~N_group+ N_within+ICC,subset(p_perm, mean_perm<0.05),mean)
-type_mode1 <- aggregate(mode1~N_group+ N_within+ICC,subset(p_perm, mode1_perm<0.05),mean)
+type_m <- aggregate(cbind(median,mean,mode1,mode0.1)~N_group+ N_within+ICC,subset(all, mode1_perm<0.05),function(x)mean(abs(x)))
 
-type_m2 <- aggregate(cbind(median, mean, mode1)~N_group+ N_within+ICC,p_perm,mean)
+setEPS()
+pdf(paste0(wd,"Figures/FigSM_type_m.pdf"), height=9, width=9)
 
-par(mfrow=c(2,2))
+{
+par(mfrow=c(2,2), cex.lab=1.5)
+plot((type_m$mean)/type_m$ICC~ power_dat$mean_boot, col=c(1:4)[factor(type_m$ICC)], pch=19, ylim=c(1,5.5), xlab="Power",ylab="Type M error", main="Mean")
+plot((type_m$median)/type_m$ICC~ power_dat$median_boot, col=c(1:4)[factor(type_m$ICC)], pch=19, ylim=c(1,5.5), xlab="Power",ylab="Type M error", main="Median")
+plot((type_m$mode1)/type_m$ICC~ power_dat$mode1_boot, col=c(1:4)[factor(type_m$ICC)], pch=19, ylim=c(1,5.5), xlab="Power",ylab="Type M error", main="Mode-1")
+plot((type_m$mode0.1)/type_m$ICC~ power_dat$mode0.1_boot, col=c(1:4)[factor(type_m$ICC)], pch=19, ylim=c(1,5.5), xlab="Power",ylab="Type M error", main="Mode-0.1")
 
-plot(type_median$median-type_median$ICC, power_dat$median_perm, col=c(1:4)[factor(type_median$ICC)])
-plot(type_mean$mean-type_mean$ICC, power_dat$mean_perm, col=c(1:4)[factor(type_mean$ICC)])
-plot(type_mode1$mode1-type_mode1$ICC, power_dat$mode1_perm, col=c(1:4)[factor(type_mode1$ICC)])
-
-par(mfrow=c(2,2))
-
-plot((type_median$median-type_median$ICC)/type_median$ICC, power_dat$median_perm, col=c(1:4)[factor(type_median$ICC)])
-plot((type_mean$mean-type_mean$ICC)/type_median$ICC, power_dat$mean_perm, col=c(1:4)[factor(type_mean$ICC)])
-plot((type_mode1$mode1-type_mode1$ICC)/type_median$ICC, power_dat$mode1_perm, col=c(1:4)[factor(type_mode1$ICC)])
-
-par(mfrow=c(2,2))
-
-plot((type_m2$median-type_m2$ICC)/type_m2$ICC, power_dat$median_perm, col=c(1:4)[factor(type_m$ICC)])
-plot((type_m2$mean-type_m2$ICC)/type_m2$ICC, power_dat$mean_perm, col=c(1:4)[factor(type_m$ICC)])
-plot((type_m2$mode1-type_m2$ICC)/type_m2$ICC, power_dat$mode1_perm, col=c(1:4)[factor(type_m$ICC)])
-
-
-
-power_dist <- NULL
-
-within_groups <- c(2,4)
-Ns <- c(20,40,80)
-ICCs <- c(0.1,0.2,0.4)
-
-
-for(i in ICCs){
-	for(j in Ns){
-		for(k in within_groups){
-			null <- subset(actual, ICC==0 & N_within==k & N_group==j)$median
-			alt <- subset(actual, N_within==k & N_group==j & ICC==i)$median
-			power_dist<- rbind(power_dist,c(ICC=i, N_group=j, N_within=k, power=mean(sapply(alt, function(x) p_func(x,null))<0.05)))
-		}
-	}
 }
+dev.off()

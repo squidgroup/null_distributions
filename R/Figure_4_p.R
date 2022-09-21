@@ -106,14 +106,14 @@ pdf(paste0(wd,"Figures/Fig4_p.pdf"), height=6, width=8)
 
 {
 par(mfrow=c(2,1),mar=c(0.5,4,4,1), cex.axis=0.75, mgp=c(2,0.5,0))
-	beeswarm(median_boot~N_group + ICC,subset(all, N_within==2), pch=19, cex=0.1, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="", labels=rep(c(20,40,80),3), ylab="P",  ylim=c(0,1), xaxt="n")
+	beeswarm(median_boot~N_group + ICC,subset(all, N_within==2), pch=19, cex=0.1, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="", labels=rep(c(20,40,80),3), ylab="p-value",  ylim=c(0,1), xaxt="n")
 	abline(v=c(3.5,6.5,9.5))
 	axis(3,c(2,5,8,11),c(0,0.1,0.2,0.4), tick=FALSE)
 	mtext("ICC",side=3, line=2)
 	mtext("a)",2,padj=-8, las=1, line=2)
 
 	par(mar=c(4,4,0.5,1))
-	beeswarm(median_boot~ N_group + ICC,subset(all, N_within==4), pch=19, cex=0.1, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Number of Groups", labels=rep(c(20,40,80),3), ylab="P",  ylim=c(0,1))	
+	beeswarm(median_boot~ N_group + ICC,subset(all, N_within==4), pch=19, cex=0.1, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Number of Groups", labels=rep(c(20,40,80),3), ylab="p-value",  ylim=c(0,1))	
 	abline(v=c(3.5,6.5,9.5))
 	mtext("b)",2,padj=-8, las=1, line=2)
 }
