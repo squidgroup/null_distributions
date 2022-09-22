@@ -40,27 +40,29 @@ pdf(paste0(wd,"Figures/FigSM_precision.pdf"), height=5, width=11)
 {
 
 # line_coords <- (1:7)*3+0.5
-par(mfrow=c(1,1), mar=c(4,4,4,1))
+par(mfrow=c(1,1), mar=c(4,4,3,1))
 
-plot(precision$mean, pch=19, ylim=c(0,70), ylab="Precision", xlab="", xaxt="n")
+plot(precision$mean, pch=20, ylim=c(0,70), ylab="Precision", xlab="", xaxt="n")
 abline(h=0)
 abline(v=line_coords, lty=c(2,1,2,1,2,1,2))
+
+points(precision$median, pch=17,col="red")
+points(precision$mode1, pch=15,col="blue")
+points(precision$mode0.1, pch=18,col="green")
+
 axis(3,c(1,3.5,6),c("",0,""), lwd.ticks=0, line=1, padj=1)
 axis(3,c(1,3.5,6) + 6,c("",0.1,""), lwd.ticks=0, line=1, padj=1)
 axis(3,c(1,3.5,6) + 12,c("",0.2,""), lwd.ticks=0, line=1, padj=1)
 axis(3,c(1,3.5,6) + 18,c("",0.4,""), lwd.ticks=0, line=1, padj=1)
-mtext("ICC", side=3, line=-3, outer=TRUE, adj=0.05)
+mtext("ICC", side=3, line=-2, outer=TRUE, adj=0.05)
 
-points(precision$median, pch=19,col="red")
-points(precision$mode1, pch=19,col="blue")
-points(precision$mode0.1, pch=19,col="green")
 
 axis(1,1:24,rep(c(20,40,80),8))
 axis(1,1:8 *3 -1,rep(c(2,4),4), tick=FALSE, line=1.5)
 
 mtext("N between", side=1, line=-3, outer=TRUE, adj=0)
 mtext("N within", side=1, line=-1.5, outer=TRUE, adj=0)
- legend("topleft",c("mean","median","mode-0.1","mode-1"), pch=19, col=c(1,2,3,4), bty="n")
+ legend("topleft",c("mean","median","mode-1","mode-0.1"), pch=c(20,17,15,18), col=c(1,2,4,3), bty="n")
 
 }
 

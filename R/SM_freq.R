@@ -42,7 +42,7 @@ actual$mode0.1_bias<-actual$mode0.1-actual$ICC
 bias<-aggregate(cbind(freq_bias,mode0.1_bias,mode1_bias,mean_bias,median_bias)~N_group+N_within+ICC,actual,mean)
 
 setEPS()
-pdf(paste0(wd,"Figures/FigSM_freq.pdf"), height=4, width=11)
+pdf(paste0(wd,"Figures/FigSM_freq.pdf"), height=5, width=11)
 {
 
 line_coords <- (1:7)*3+0.5
@@ -76,6 +76,6 @@ mtext("N between", side=1, line=-3, outer=TRUE, adj=0)
 mtext("N within", side=1, line=-1.5, outer=TRUE, adj=0)
 
 
-legend("bottomleft",c("mean","median","mode-0.1","mode-1","freq"), pch=c(20,17,15,18,19), col=c(1,2,3,4,"purple"), bty="n")
+legend("bottomleft",c("mean","median","mode-1","mode-0.1","freq"), pch=c(20,17,15,18,19), col=c(1,2,4,3,"purple"), bty="n")
 }
 dev.off()

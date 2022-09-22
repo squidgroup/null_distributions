@@ -114,7 +114,11 @@ save(out, file=paste0(wd,"Data/Intermediate/prior_impact.Rdata"))
 }
 load(paste0(wd,"Data/Intermediate/prior_impact.Rdata"))
 
+
+
+
 out2<-do.call(rbind,out)
+
 head(out2,20)
 library("beeswarm")
 	beeswarm(estimate~prior+type,out2, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap", ylab="Estimate")
@@ -124,9 +128,21 @@ pdf(paste0(wd,"Figures/FigSM_prior.pdf"), height=9, width=9)
 {
 par(mfrow=c(2,2))
 	beeswarm(estimate~prior,subset(out2,type=="mode0.1"), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Uniform(0,2)"), ylab="Estimate", main="Mode: scale= 0.1")
+abline(h=0.2, col="red")
+points(aggregate(estimate~prior,subset(out2,type=="mode0.1"),mean)$estimate, cex=1.5, pch=19, col="orange")
+	# ICC=0.2, N_group=80, N_within=2
 	beeswarm(estimate~prior,subset(out2,type=="mode1"), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Uniform(0,2)"), ylab="Estimate", main="Mode: scale= 1")
+	abline(h=0.2, col="red")
+	points(aggregate(estimate~prior,subset(out2,type=="mode1"),mean)$estimate, cex=1.5, pch=19, col="orange")
+
 	beeswarm(estimate~prior,subset(out2,type=="mean"), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Uniform(0,2)"), ylab="Estimate", main="Mean")
+	abline(h=0.2, col="red")
+	points(aggregate(estimate~prior,subset(out2,type=="mean"),mean)$estimate, cex=1.5, pch=19, col="orange")
+
 	beeswarm(estimate~prior,subset(out2,type=="median"), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Uniform(0,2)"), ylab="Estimate", main="Median")
+	abline(h=0.2, col="red")
+	points(aggregate(estimate~prior,subset(out2,type=="median"),mean)$estimate, cex=1.5, pch=19, col="orange")
+
 }
 dev.off()
 

@@ -214,7 +214,7 @@ axis(4)
 mtext("c)",2,padj=-9.5, las=1, line=3)
 
 
-legend("topleft",c("mean","median","mode-0.1","mode-1"), cex=1.25,pch=c(19,17,15,18), col=c(1,2,3,4), bty="n")
+legend("topleft",c("mean","median","mode-1","mode-0.1"), cex=1.25,pch=c(19,17,15,18), col=c(1,2,4,3), bty="n")
 
 
 
