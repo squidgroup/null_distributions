@@ -1,0 +1,14 @@
+load("Data/RR_example_results.RData")
+
+pdf("Figures/RRexample.pdf", height=6, width=8)
+par(mfrow=c(2,1),mar=c(0.5,4,4,1), cex.axis=0.75, mgp=c(2,0.5,0))
+beeswarm(est~type, res, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="", labels=rep(c(20,40,80),3), ylab="Variance estimate",  ylim=c(0,0.5), xaxt="n")
+mtext("a)",2,padj=-8, las=1, line=2)
+abline(h=0.1)
+
+par(mar=c(4,4,0.5,1))
+beeswarm(est~type, res_GT, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap", labels=rep(c(20,40,80),3), ylab="Variance estimate",  ylim=c(0,0.5), xlab="Type of permutation", xaxt="n")
+mtext("b)",2,padj=-8, las=1, line=2)
+abline(h=obs_est[4])
+axis(1, c(1,2,3,4,5), c("boot", "perm. ID", "perm. x", "perm. x within ID", "perm. y"))
+dev.off()
