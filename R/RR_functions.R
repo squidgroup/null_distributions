@@ -52,7 +52,7 @@ mod<-function(x){
   
   
   params<-c("beta_0", "beta_1", "sigma2_I2")
-  ni <- 1500 ##Number of iterations
+  ni <- 5500 ##Number of iterations
   nc <- 1  ##Number of chains
   nt <- 1 ## Thinning interval
   nb <- 500 ## Number of iterations to discard
