@@ -22,7 +22,7 @@ squid_data <- simulate_population(
       beta = c(0.2)
     ), 
     residual = list(
-      vcov = c(0.66)
+      vcov = c(0.7)
     ),
     interactions = list(
       names = c("ind_slope:environment"),
