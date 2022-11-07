@@ -1,4 +1,5 @@
 
+
 rm(list=ls())
 
 run=FALSE
@@ -12,6 +13,7 @@ library(lme4)
 library(parallel)
 library(rstan)
 library(MCMCglmm)
+library(lme4)
 rstan_options("auto_write" = TRUE)
 
 wd <- "~/github/bayes_perm/"
@@ -69,7 +71,7 @@ prior_sim <- function(n_pop, ICC, N_group, N_within, mc.cores=4){
 		# mcmc_mod <- MCMCglmm(y~1,random=~ID,data=dat[[i]], prior=prior, verbose=FALSE)
 		# mcmc_post <- mcmc_mod$VCV[,"ID"]
 		
-		## maybe add in freq
+		modF <- lmer(y~1+(1|ID),data=dat[[i]])
 
 		cat(i, " ")
 
@@ -92,6 +94,11 @@ prior_sim <- function(n_pop, ICC, N_group, N_within, mc.cores=4){
 				prior="U",
 				type=c("mode0.1","mode1","median","mean"),
 				estimate=stan_out(stan_mod4)[1:4]
+			),
+			data.frame(
+				prior="REML",
+				type="freq",
+				estimate=as.numeric(summary(modF)$varcor)
 			)
 			# ,
 			# data.frame(
@@ -113,6 +120,15 @@ if(run){
 	save(out, file=paste0(wd,"Data/Intermediate/prior_impact.Rdata"))
 }
 load(paste0(wd,"Data/Intermediate/prior_impact.Rdata"))
+
+# out <- mclapply(1:500,function(i){
+	
+# 	modF <- lmer(y~1+(1|ID),data=dat[[i]])
+
+# 	rbind(out[[i]], data.frame(prior="REML",type="freq",estimate=as.numeric(summary(modF)$varcor)))
+# }, mc.cores=6)
+
+
 
 
 out2<-do.call(rbind,out)
@@ -139,25 +155,8 @@ dev.off()
 
 	beeswarm(estimate~prior+type,out2, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap", ylab="Estimate")
 
-setEPS()
-pdf(paste0(wd,"Figures/FigSM_prior.pdf"), height=9, width=9)
-{
-par(mfrow=c(2,2))
-	
-	# ICC=0.2, N_group=80, N_within=2
-	beeswarm(estimate~prior,subset(out2,type=="mode1"), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Uniform(0,2)"), ylab="Estimate", main="Mode: scale= 1")
-	abline(h=0.2, col="red")
-	points(aggregate(estimate~prior,subset(out2,type=="mode1"),mean)$estimate, cex=1.5, pch=19, col="orange")
 
-	beeswarm(estimate~prior,subset(out2,type=="mean"), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Uniform(0,2)"), ylab="Estimate", main="Mean")
-	abline(h=0.2, col="red")
-	points(aggregate(estimate~prior,subset(out2,type=="mean"),mean)$estimate, cex=1.5, pch=19, col="orange")
+	beeswarm(estimate~prior+type,subset(out2,type%in%c("mode0.1","mode1", "freq")), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap", ylab="Estimate")
 
-	beeswarm(estimate~prior,subset(out2,type=="median"), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Uniform(0,2)"), ylab="Estimate", main="Median")
-	abline(h=0.2, col="red")
-	points(aggregate(estimate~prior,subset(out2,type=="median"),mean)$estimate, cex=1.5, pch=19, col="orange")
-
-}
-dev.off()
-
-
+plot(subset(out2,type=="mode0.1" & prior=="I")$estimate,subset(out2,type== "freq")$estimate)
+plot(subset(out2,type=="mode1" & prior=="I")$estimate,subset(out2,type== "freq")$estimate)
