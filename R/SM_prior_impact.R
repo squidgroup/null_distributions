@@ -52,12 +52,22 @@ prior_sim <- function(n_pop, ICC, N_group, N_within, mc.cores=4){
 
 		stan_mod2 <- sampling(LMM_stan, data=stan_dat2, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
 
-		stan_mod3 <- sampling(LMM_stanU, data=stan_dat1, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
+		stan_dat3 <- list(
+			N = nrow(dat[[i]]),
+			N_ID = length(unique(dat[[i]][,"ID"])),
+			y = dat[[i]][,"y"],
+			ID = dat[[i]][,"ID"],
+			cauchy_scale=25)
 
-		prior <- list(G = list(g1=list(V = 1e-16, nu = -2)),R = list(V = 1e-16, nu = -2))
+		stan_mod3 <- sampling(LMM_stan, data=stan_dat3, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
 
-		mcmc_mod <- MCMCglmm(y~1,random=~ID,data=dat[[i]], prior=prior, verbose=FALSE)
-		mcmc_post <- mcmc_mod$VCV[,"ID"]
+
+		stan_mod4 <- sampling(LMM_stanU, data=stan_dat1, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
+
+		# prior <- list(G = list(g1=list(V = 1e-16, nu = -2)),R = list(V = 1e-16, nu = -2))
+
+		# mcmc_mod <- MCMCglmm(y~1,random=~ID,data=dat[[i]], prior=prior, verbose=FALSE)
+		# mcmc_post <- mcmc_mod$VCV[,"ID"]
 		
 		## maybe add in freq
 
@@ -75,15 +85,20 @@ prior_sim <- function(n_pop, ICC, N_group, N_within, mc.cores=4){
 				estimate=stan_out(stan_mod2)[1:4]
 			),
 			data.frame(
-				prior="U",
+				prior="C25",
 				type=c("mode0.1","mode1","median","mean"),
 				estimate=stan_out(stan_mod3)[1:4]
-			),
-			data.frame(
-				prior="I",
+			),			data.frame(
+				prior="U",
 				type=c("mode0.1","mode1","median","mean"),
-				estimate=c(post_mode(mcmc_post,adjust=0.1), post_mode(mcmc_post,adjust=1),  median(mcmc_post), mean(mcmc_post))
+				estimate=stan_out(stan_mod4)[1:4]
 			)
+			# ,
+			# data.frame(
+			# 	prior="I",
+			# 	type=c("mode0.1","mode1","median","mean"),
+			# 	estimate=c(post_mode(mcmc_post,adjust=0.1), post_mode(mcmc_post,adjust=1),  median(mcmc_post), mean(mcmc_post))
+			# )
 		)
 
 
@@ -94,7 +109,7 @@ prior_sim <- function(n_pop, ICC, N_group, N_within, mc.cores=4){
 
 if(run){
 	set.seed(20221005)
-	out<-prior_sim(n_pop=500, ICC=0.2, N_group=80, N_within=2, mc.cores=8)
+	out<-prior_sim(n_pop=100, ICC=0.2, N_group=80, N_within=2, mc.cores=8)
 	save(out, file=paste0(wd,"Data/Intermediate/prior_impact.Rdata"))
 }
 load(paste0(wd,"Data/Intermediate/prior_impact.Rdata"))
@@ -104,7 +119,7 @@ out2<-do.call(rbind,out)
 
 
 prior_plot <- function(stat, ...){
-	beeswarm(estimate~prior,subset(out2,type==stat), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Improper","Uniform(0,2)"), ylab="Estimate",... )
+	beeswarm(estimate~prior,subset(out2,type==stat), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Cauchy(0,25)","Uniform(0,2)"), ylab="Estimate",... )
 	abline(h=0.2, col="red")
 	points(aggregate(estimate~prior,subset(out2,type==stat),mean)$estimate, cex=1.5, pch=19, col="orange")
 }
