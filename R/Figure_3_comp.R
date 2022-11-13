@@ -204,7 +204,7 @@ mtext("b)",2,padj=-9.5, las=1, line=3)
 
 par(mar=c(4,5,0,2.5))
 
-plot(abs_rel_bias$mean_rel_bias*100, cex=pt.cex,pch=19, ylim=c(0,150), ylab="Absolute Relative Bias (%)", xaxt="n", xlab="")
+plot(abs_rel_bias$mean_rel_bias*100, cex=pt.cex,pch=19, ylim=c(0,150), ylab="Absoluted Relative Bias (%)", xaxt="n", xlab="")
 abline(h=0)
 abline(v=line_coords, lty=line_lty)
 points(abs_rel_bias$median_rel_bias*100, cex=pt.cex,pch=17,col="red")

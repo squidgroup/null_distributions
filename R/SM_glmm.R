@@ -58,19 +58,19 @@ pdf(paste0(wd,"Figures/FigSM_bp_glmm.pdf"), height=11, width=11)
 
 
 par(mfrow=c(2,2), cex.lab=1.5)
-plot(mean_perm~mean_boot,p, pch=pch, cex=cex, col=col, main="Posterior Mean", xlab="Parametric Bootstrap", ylab="Permutation")
+plot(mean_perm~mean_boot,p, pch=pch, cex=cex, col=col, main="Posterior Mean", xlab="Simulation", ylab="Permutation")
 abline(0,1, col="red")
 text(0.1,0.9,paste0("r=",round(cor(p[,"mean_boot"],p[,"mean_perm"]),3)), cex=1.5)
 
-plot(median_perm~median_boot,p, pch=pch, cex=cex, col=col, main="Posterior Median", xlab="Parametric Bootstrap", ylab="Permutation")
+plot(median_perm~median_boot,p, pch=pch, cex=cex, col=col, main="Posterior Median", xlab="Simulation", ylab="Permutation")
 abline(0,1, col="red")
 text(0.1,0.9,paste0("r=",round(cor(p[,"median_boot"],p[,"median_perm"]),3)), cex=1.5)
 
-plot(mode1_perm~mode1_boot,p, pch=pch, cex=cex, col=col, main="Posterior Mode (adjust=1)", xlab="Parametric Bootstrap", ylab="Permutation")
+plot(mode1_perm~mode1_boot,p, pch=pch, cex=cex, col=col, main="Posterior Mode (adjust=1)", xlab="Simulation", ylab="Permutation")
 abline(0,1, col="red")
 text(0.1,0.9,paste0("r=",round(cor(p[,"mode1_boot"],p[,"mode1_perm"]),3)), cex=1.5)
 
-plot(mode0.1_perm~mode0.1_boot,p, pch=pch, cex=cex, col=col, main="Posterior Mode (adjust=0.1)", xlab="Parametric Bootstrap", ylab="Permutation")
+plot(mode0.1_perm~mode0.1_boot,p, pch=pch, cex=cex, col=col, main="Posterior Mode (adjust=0.1)", xlab="Simulation", ylab="Permutation")
 abline(0,1, col="red")
 text(0.1,0.9,paste0("r=",round(cor(p[,"mode0.1_boot"],p[,"mode0.1_perm"]),3)), cex=1.5)
 }

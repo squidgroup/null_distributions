@@ -63,13 +63,28 @@ prior_sim <- function(n_pop, ICC, N_group, N_within, mc.cores=4){
 
 		stan_mod3 <- sampling(LMM_stan, data=stan_dat3, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
 
+		stan_dat4 <- list(
+			N = nrow(dat[[i]]),
+			N_ID = length(unique(dat[[i]][,"ID"])),
+			y = dat[[i]][,"y"],
+			ID = dat[[i]][,"ID"],
+			uniform_max=5)
 
-		stan_mod4 <- sampling(LMM_stanU, data=stan_dat1, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
+		stan_mod4 <- sampling(LMM_stanU, data=stan_dat4, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
 
-		# prior <- list(G = list(g1=list(V = 1e-16, nu = -2)),R = list(V = 1e-16, nu = -2))
+		stan_dat5 <- list(
+			N = nrow(dat[[i]]),
+			N_ID = length(unique(dat[[i]][,"ID"])),
+			y = dat[[i]][,"y"],
+			ID = dat[[i]][,"ID"],
+			uniform_max=25)
 
-		# mcmc_mod <- MCMCglmm(y~1,random=~ID,data=dat[[i]], prior=prior, verbose=FALSE)
-		# mcmc_post <- mcmc_mod$VCV[,"ID"]
+		stan_mod5 <- sampling(LMM_stanU, data=stan_dat5, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
+
+		prior <- list(G = list(g1=list(V = 1e-16, nu = -2)),R = list(V = 1e-16, nu = -2))
+
+		mcmc_mod <- MCMCglmm(y~1,random=~ID,data=dat[[i]], prior=prior, verbose=FALSE)
+		mcmc_post <- mcmc_mod$VCV[,"ID"]
 		
 		modF <- lmer(y~1+(1|ID),data=dat[[i]])
 
@@ -90,22 +105,28 @@ prior_sim <- function(n_pop, ICC, N_group, N_within, mc.cores=4){
 				prior="C25",
 				type=c("mode0.1","mode1","median","mean"),
 				estimate=stan_out(stan_mod3)[1:4]
-			),			data.frame(
-				prior="U",
+			),
+			data.frame(
+				prior="U5",
 				type=c("mode0.1","mode1","median","mean"),
 				estimate=stan_out(stan_mod4)[1:4]
 			),
+			data.frame(
+				prior="U25",
+				type=c("mode0.1","mode1","median","mean"),
+				estimate=stan_out(stan_mod5)[1:4]
+			),			
 			data.frame(
 				prior="REML",
 				type="freq",
 				estimate=as.numeric(summary(modF)$varcor)
 			)
-			# ,
-			# data.frame(
-			# 	prior="I",
-			# 	type=c("mode0.1","mode1","median","mean"),
-			# 	estimate=c(post_mode(mcmc_post,adjust=0.1), post_mode(mcmc_post,adjust=1),  median(mcmc_post), mean(mcmc_post))
-			# )
+			,
+			data.frame(
+				prior="I",
+				type=c("mode0.1","mode1","median","mean"),
+				estimate=c(post_mode(mcmc_post,adjust=0.1), post_mode(mcmc_post,adjust=1),  median(mcmc_post), mean(mcmc_post))
+			)
 		)
 
 
@@ -133,15 +154,19 @@ load(paste0(wd,"Data/Intermediate/prior_impact.Rdata"))
 
 out2<-do.call(rbind,out)
 
+out2$prior <- factor(out2$prior, levels=c("REML", "I", "C2", "C25", "C5", "U25", "U5"))
+
+aggregate(estimate~prior+type,out2,mean)
 
 prior_plot <- function(stat, ...){
-	beeswarm(estimate~prior,subset(out2,type==stat), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("Cauchy(0,2)","Cauchy(0,5)","Cauchy(0,25)","Uniform(0,2)"), ylab="Estimate",... )
+	dat <- rbind(subset(out2,type=="freq"),subset(out2,type==stat))
+	beeswarm(estimate~prior,dat, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("REML","Improper","C(0,2)","C(0,5)","C(0,25)","U(0,5)","U(0,25)"), ylab="Estimate",... )
 	abline(h=0.2, col="red")
-	points(aggregate(estimate~prior,subset(out2,type==stat),mean)$estimate, cex=1.5, pch=19, col="orange")
+	points(aggregate(estimate~prior,dat,mean)$estimate, cex=1.5, pch=19, col=c("blue",rep("orange",6)))
 }
 
 setEPS()
-pdf(paste0(wd,"Figures/FigSM_prior.pdf"), height=9, width=9)
+pdf(paste0(wd,"Figures/FigSM_prior.pdf"), height=9, width=11)
 {
 par(mfrow=c(2,2))
 	prior_plot(stat="mode0.1",main="Mode: scale= 0.1")
@@ -153,10 +178,8 @@ par(mfrow=c(2,2))
 }
 dev.off()
 
-	beeswarm(estimate~prior+type,out2, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap", ylab="Estimate")
 
 
-	beeswarm(estimate~prior+type,subset(out2,type%in%c("mode0.1","mode1", "freq")), pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap", ylab="Estimate")
 
 plot(subset(out2,type=="mode0.1" & prior=="I")$estimate,subset(out2,type== "freq")$estimate)
 plot(subset(out2,type=="mode1" & prior=="I")$estimate,subset(out2,type== "freq")$estimate)

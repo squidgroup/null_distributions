@@ -15,25 +15,29 @@ source(paste0(wd,"R/00_functions.R"))
 run <- FALSE
 
 if(run){
-	set.seed(1250)
+	set.seed(82)
 	squid_dat<-simulate_population(
-			data_structure= make_structure(paste0("ID(80)"),repeat_obs=2),
-			parameters= list( ID=list(vcov=0.2), residual=list(vcov=0.8))
-			)
+		data_structure= make_structure(paste0("ID(40)"),repeat_obs=2),
+		parameters= list( ID=list(vcov=0.2), residual=list(vcov=0.8))
+		)
 	dat <- get_population_data(squid_dat)
 
 	LMM_stan <- stan_model(file = paste0(wd,"stan/simple_LMM.stan"))
 
 	stan_dat <- list(
-				N = nrow(dat),
-				N_ID = length(unique(dat[,"ID"])),
-				y = dat[,"y"],
-				ID = dat[,"ID"],
-				cauchy_scale=2)
+		N = nrow(dat),
+		N_ID = length(unique(dat[,"ID"])),
+		y = dat[,"y"],
+		ID = dat[,"ID"],
+		cauchy_scale=2)
 
 	stan_mod <- sampling(LMM_stan, data=stan_dat, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
 
 	actual<-stan_out(stan_mod)
+	post <- extract(stan_mod)$sigma2_ID
+hist(post, breaks=seq(0,2,length.out=101))
+
+
 
 	null <- do.call(rbind,mclapply(1:1000,function(j){
 		stan_dat$ID <- sample(dat[,"ID"], replace=FALSE)
@@ -42,21 +46,19 @@ if(run){
 		stan_out(null_mod)
 	}, mc.cores=8))
 
-	post <- extract(stan_mod)$sigma2_ID
-
 
 	squid_dat2<-simulate_population(
-			data_structure= make_structure(paste0("ID(80)"),repeat_obs=2),
-			parameters= list( ID=list(vcov=0.4), residual=list(vcov=0.6))
-			)
+		data_structure= make_structure(paste0("ID(80)"),repeat_obs=4),
+		parameters= list( ID=list(vcov=0.2), residual=list(vcov=0.8))
+		)
 	dat2 <- get_population_data(squid_dat2)
 
 	stan_dat2 <- list(
-				N = nrow(dat2),
-				N_ID = length(unique(dat2[,"ID"])),
-				y = dat2[,"y"],
-				ID = dat2[,"ID"],
-				cauchy_scale=2)
+		N = nrow(dat2),
+		N_ID = length(unique(dat2[,"ID"])),
+		y = dat2[,"y"],
+		ID = dat2[,"ID"],
+		cauchy_scale=2)
 
 	stan_mod2 <- sampling(LMM_stan, data=stan_dat2, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
 
@@ -73,6 +75,7 @@ if(run){
 	},mc.cores=8))
 
 	post2 <- extract(stan_mod2)$sigma2_ID
+hist(post2, breaks=seq(0,2,length.out=101))
 	
 	save(actual,actual2,null,null2,post,post2,file=paste0(wd,"Data/Intermediate/figure1_data.Rdata"))
 
@@ -93,10 +96,10 @@ text(0.8,4,print_func(actual2))
 mtext("a)",2,padj=-7, las=1)
 
 
-hist(null2[,"mean"], main="",xlim=c(0,1),freq=FALSE, breaks=seq(0,2,length.out=101),ylim=c(0,16), xlab="Permuted Posterior Means", yaxt="n", ylab="")
+hist(null2[,"mean"], main="",xlim=c(0,1),freq=FALSE, breaks=seq(0,2,length.out=101),ylim=c(0,20), xlab="Permuted Posterior Means", yaxt="n", ylab="")
 abline(v=actual2["mean"], col="red",lwd=2)
 p_perm2 <- p_func(actual2["mean"],null2[,"mean"])
-text(0.8,10,paste("P =",p_perm2))
+text(0.8,12,paste("P <0.001"))
   # text(0.8,10,bquote(P[perm]==.(p_perm2)))
 mtext("c)",2,padj=-7, las=1)
 
@@ -107,10 +110,10 @@ text(0.8,4,print_func(actual))
 mtext("b)",2,padj=-7, las=1)
 
 
-hist(null[,"mean"], main="",xlim=c(0,1),freq=FALSE, breaks=seq(0,2,length.out=101),ylim=c(0,16), xlab="Permuted Posterior Means", yaxt="n", ylab="")
+hist(null[,"mean"], main="",xlim=c(0,1),freq=FALSE, breaks=seq(0,2,length.out=101),ylim=c(0,20), xlab="Permuted Posterior Means", yaxt="n", ylab="")
 abline(v=actual["mean"], col="red",lwd=2)
 p_perm <- p_func(actual["mean"],null[,"mean"])
-text(0.8,10,paste("P =",p_perm))
+text(0.8,12,paste("P =",p_perm))
 # text(0.8,10,bquote(P[perm]==.(p_perm)))
 mtext("d)",2,padj=-7, las=1)
 

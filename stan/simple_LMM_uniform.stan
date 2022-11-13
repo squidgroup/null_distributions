@@ -3,6 +3,7 @@ data{
   int<lower=0> N_ID;
   vector[N] y;
   int<lower=0,upper=N_ID> ID[N];
+  real<lower=0> uniform_max;
 }
 parameters{
   real beta_0;
@@ -16,8 +17,8 @@ model{
   ID_effects_scaled ~ normal(0,1);
 
   beta_0 ~ normal(0,10);
-  sigma_ID ~ uniform(0,5);
-  sigma_E ~ uniform(0,5);
+  sigma_ID ~ uniform(0,uniform_max);
+  sigma_E ~ uniform(0,uniform_max);
 
   y ~ normal(mu, sigma_E);
 }
