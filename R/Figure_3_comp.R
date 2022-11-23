@@ -222,7 +222,7 @@ legend("topleft",c("mean","median","mode-1","mode-0.1"), cex=1.25,pch=c(19,17,15
 axis(1,1:24,rep(c(20,40,80),8), cex.axis=1.2)
 axis(1,1:8 *3 -1,rep(c(2,4),4), tick=FALSE, line=1.5, cex.axis=1.25)
 
-mtext("N between", side=1, line=-3, outer=TRUE, adj=0)
+mtext("N among", side=1, line=-3, outer=TRUE, adj=0)
 mtext("N within", side=1, line=-1.5, outer=TRUE, adj=0)
 
 }

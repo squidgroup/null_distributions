@@ -82,7 +82,7 @@ abline(v=c(2.5,4.5,6.5))
 mtext("a)",2,padj=-8, las=1, line=2)
 
 par(mar=c(3,4,1,1))
-beeswarm(estimate~sim_var+type,p_long_boot, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Between group variance", ylab="p-value", labels=rep(c(0,0.2),4))#, labels=c("ML","Posterior Mean","Posterior Median","Posterior Mode"))
+beeswarm(estimate~sim_var+type,p_long_boot, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Among group variance", ylab="p-value", labels=rep(c(0,0.2),4))#, labels=c("ML","Posterior Mean","Posterior Median","Posterior Mode"))
 # boxplot(estimate~sim_var+type,p_long, pch=19, cex=0.5,xlab="Between group variance", ylab=bquote(P[perm]),boxwex=0.5, names=rep(c(0,0.2),4))#, 
 abline(v=c(2.5,4.5,6.5))
 mtext("b)",2,padj=-8, las=1, line=2)

@@ -60,7 +60,7 @@ mtext("ICC", side=3, line=-2, outer=TRUE, adj=0.05)
 axis(1,1:24,rep(c(20,40,80),8))
 axis(1,1:8 *3 -1,rep(c(2,4),4), tick=FALSE, line=1.5)
 
-mtext("N between", side=1, line=-3, outer=TRUE, adj=0)
+mtext("N among", side=1, line=-3, outer=TRUE, adj=0)
 mtext("N within", side=1, line=-1.5, outer=TRUE, adj=0)
  legend("topleft",c("mean","median","mode-1","mode-0.1"), pch=c(20,17,15,18), col=c(1,2,4,3), bty="n")
 
