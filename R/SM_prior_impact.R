@@ -32,6 +32,8 @@ prior_sim <- function(n_pop, ICC, N_group, N_within, mc.cores=4){
 
 	LMM_stan <- stan_model(file = paste0(wd,"stan/simple_LMM.stan"))
 	LMM_stanU <- stan_model(file = paste0(wd,"stan/simple_LMM_uniform.stan"))
+	LMM_stanN <- stan_model(file = paste0(wd,"stan/simple_LMM_normal.stan"))
+	LMM_stanU_var <- stan_model(file = paste0(wd,"stan/simple_LMM_uniform_variance.stan"))
 
 #i=1
 	dist_M <- mclapply(1:n_pop,function(i){
@@ -81,6 +83,25 @@ prior_sim <- function(n_pop, ICC, N_group, N_within, mc.cores=4){
 
 		stan_mod5 <- sampling(LMM_stanU, data=stan_dat5, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
 
+		stan_dat6 <- list(
+			N = nrow(dat[[i]]),
+			N_ID = length(unique(dat[[i]][,"ID"])),
+			y = dat[[i]][,"y"],
+			ID = dat[[i]][,"ID"],
+			uniform_max=25)
+
+		stan_mod6 <- sampling(LMM_stanU_var, data=stan_dat6, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
+
+		stan_dat7 <- list(
+			N = nrow(dat[[i]]),
+			N_ID = length(unique(dat[[i]][,"ID"])),
+			y = dat[[i]][,"y"],
+			ID = dat[[i]][,"ID"],
+			normal_scale=1)
+
+		stan_mod7 <- sampling(LMM_stanN, data=stan_dat7, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
+
+
 		prior <- list(G = list(g1=list(V = 1e-16, nu = -2)),R = list(V = 1e-16, nu = -2))
 
 		mcmc_mod <- MCMCglmm(y~1,random=~ID,data=dat[[i]], prior=prior, verbose=FALSE)
@@ -117,6 +138,16 @@ prior_sim <- function(n_pop, ICC, N_group, N_within, mc.cores=4){
 				estimate=stan_out(stan_mod5)[1:4]
 			),			
 			data.frame(
+				prior="U25var",
+				type=c("mode0.1","mode1","median","mean"),
+				estimate=stan_out(stan_mod6)[1:4]
+			),	
+			data.frame(
+				prior="N1",
+				type=c("mode0.1","mode1","median","mean"),
+				estimate=stan_out(stan_mod7)[1:4]
+			),
+			data.frame(
 				prior="REML",
 				type="freq",
 				estimate=as.numeric(summary(modF)$varcor)
@@ -138,7 +169,7 @@ prior_sim <- function(n_pop, ICC, N_group, N_within, mc.cores=4){
 if(run){
 	set.seed(20221005)
 	out<-prior_sim(n_pop=100, ICC=0.2, N_group=80, N_within=2, mc.cores=8)
-	save(out, file=paste0(wd,"Data/Intermediate/prior_impact.Rdata"))
+	save(out, file=paste0(wd,"Data/Intermediate/prior_impact2.Rdata"))
 }
 load(paste0(wd,"Data/Intermediate/prior_impact.Rdata"))
 
@@ -154,21 +185,25 @@ load(paste0(wd,"Data/Intermediate/prior_impact.Rdata"))
 
 out2<-do.call(rbind,out)
 
-out2$prior <- factor(out2$prior, levels=c("REML", "I", "C2", "C25", "C5", "U25", "U5"))
+out2$prior2 <- factor(out2$prior, levels=c("REML", "I", "U25var", "C2", "C5", "C25", "N1", "U5", "U25"))
+
+
+tail(out2,20)
 
 aggregate(estimate~prior+type,out2,mean)
 
 prior_plot <- function(stat, ...){
 	dat <- rbind(subset(out2,type=="freq"),subset(out2,type==stat))
-	beeswarm(estimate~prior,dat, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("REML","Improper","C(0,2)","C(0,5)","C(0,25)","U(0,5)","U(0,25)"), ylab="Estimate",... )
+	beeswarm(estimate~prior2,dat, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("REML","Improper","U(0,25)-var","C(0,2)","C(0,5)","C(0,25)","N(0,1)","U(0,5)","U(0,25)"), ylab="Estimate",... )
 	abline(h=0.2, col="red")
-	points(aggregate(estimate~prior,dat,mean)$estimate, cex=1.5, pch=19, col=c("blue",rep("orange",6)))
+	points(aggregate(estimate~prior2,dat,mean)$estimate, cex=1.5, pch=19, col=c("blue",rep("orange",7)))
 }
 
 setEPS()
 pdf(paste0(wd,"Figures/FigSM_prior.pdf"), height=9, width=11)
 {
-par(mfrow=c(2,2))
+# par(mfrow=c(2,2))
+	par(mfrow=c(4,1))
 	prior_plot(stat="mode0.1",main="Mode: scale= 0.1")
 	prior_plot(stat="mode1",main="Mode: scale= 1")
 	prior_plot(stat="mean",main="Mean")
