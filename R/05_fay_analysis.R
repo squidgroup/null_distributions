@@ -1,11 +1,11 @@
-#These biases have been seen before, but not noted as due to the choice of central tendency. Fay et al 2022, for example, note overestimation of variance components in Bernoulli models, which reduce as sample sizes and effect size increase. Fay et al use the posterior mean as a summary statistic, and (as we show in the supplements) this bias will decrease (although not disappear) through the use of posterior median. Its worth noting that this isn't just a bias in Bernoulli models, but a general property of summarising posterior distributions of variance components
+
 rm(list=ls())
 library(squidSim)
 library(parallel)
 library(rstan)
 rstan_options("auto_write" = TRUE)
 
-wd <- "~/github/bayes_perm/"
+wd <- "~/github/null_distributions/"
 
 source(paste0(wd,"R/00_functions.R"))
 

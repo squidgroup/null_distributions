@@ -3,7 +3,7 @@ rm(list=ls())
 library(scales)
 library(beeswarm)
 
-wd <- "~/github/bayes_perm/"
+wd <- "~/github/null_distributions/"
 
 source(paste0(wd,"R/00_functions.R"))
 
@@ -127,3 +127,19 @@ mtext("b)",2,padj=-15, las=1, line=2)
 
 }
 dev.off()
+
+
+
+
+power_dat <- aggregate(cbind(median_boot,median_perm)~N_group+ N_within+ICC,all,function(x) mean(x<0.05))
+
+power_dat2 <- aggregate(cbind(median_boot,median_perm)~N_group+ N_within+ICC,all,mean)
+
+power_dat
+
+plot(power_dat$median_boot,power_dat2$median_boot)
+
+mu = seq(0,1,0.01)
+power = 1-(1-0.05)^(1/mu -1)
+
+lines(mu~power)

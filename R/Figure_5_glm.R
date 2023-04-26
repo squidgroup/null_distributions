@@ -6,6 +6,10 @@ wd <- "~/github/bayes_perm/"
 source(paste0(wd,"R/00_functions.R"))
 
 hist(boot::inv.logit(rnorm(100000,0,sqrt(0.2))), breaks=50)
+hist(boot::inv.logit(rnorm(100000,0,sqrt(0.4))), breaks=50)
+hist(boot::inv.logit(rnorm(100000,0,sqrt(0.8))), breaks=50)
+
+
 
 # load(paste0(wd,"Data/Intermediate/GLMM_sim_null.Rdata"))
 load( file=paste0(wd,"Data/Intermediate/GLMM_sim.Rdata"))

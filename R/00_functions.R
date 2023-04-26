@@ -33,6 +33,20 @@ gaussian_mods <- function(dat){
 		list(summary = c(freq=as.numeric(summary(modF)$varcor),stan_out(stan_mod)), data=data, post = as.data.frame(extract(stan_mod, permuted=FALSE)[,,1:2]))
 }
 
+bern_mods <- function(dat){
+		data <- dat[,c("y","ID")]
+		data$ID <- as.numeric(as.factor(data$ID))
+		
+		stan_dat <- list(
+			N = nrow(data),
+			N_ID = length(unique(data[,"ID"])),
+			y = data[,"y"],
+			ID = as.numeric(as.factor(data[,"ID"])))
+
+		stan_mod <- sampling(bern_stan, data=stan_dat, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID"), refresh=0)
+		
+		list(summary = stan_out(stan_mod), data=data, post = as.data.frame(extract(stan_mod, permuted=FALSE)[,,1]))
+}
 
 
 Stack <- function(x, col2stack, value.name="value", group.name="group", levels=NULL){
