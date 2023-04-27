@@ -48,6 +48,20 @@ bern_mods <- function(dat){
 		list(summary = stan_out(stan_mod), data=data, post = as.data.frame(extract(stan_mod, permuted=FALSE)[,,1]))
 }
 
+pois_mods <- function(dat){
+		data <- dat[,c("y","ID")]
+		data$ID <- as.numeric(as.factor(data$ID))
+		
+		stan_dat <- list(
+			N = nrow(data),
+			N_ID = length(unique(data[,"ID"])),
+			y = data[,"y"],
+			ID = as.numeric(as.factor(data[,"ID"])))
+
+		stan_mod <- sampling(pois_stan, data=stan_dat, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID","sigma2_E"), refresh=0)
+		
+		list(summary = stan_out(stan_mod), data=data, post = as.data.frame(extract(stan_mod, permuted=FALSE)[,,1:2]))
+}
 
 Stack <- function(x, col2stack, value.name="value", group.name="group", levels=NULL){
 	if(is.character(col2stack)) {
@@ -85,4 +99,34 @@ stan_out_RR <- function(model){
 print_func <- function(x) {
 	x<-round(x,3)
 	paste0(x["mean"]," (",x["mode1"],") \n [",x["LCI"],",",x["UCI"],"]")
+}
+
+
+## convert from expected to latent scale
+exp2lat<- function(mean,cov){
+	mean <- as.matrix(mean)
+	cov <- as.matrix(cov)
+	
+	mean_out <- rep(NA,nrow(cov))
+	for(i in 1:nrow(cov)) mean_out[i] <- log(mean[i]^2/sqrt(mean[i]^2+cov[i,i]))
+	
+	cov_out <- matrix(NA,nrow(cov),ncol(cov))
+	for(i in 1:nrow(cov)){
+		for(j in 1:ncol(cov)) cov_out[i,j] <- log(1 + cov[i,j]/(mean[i]*mean[j]))
+	}
+	return(list(mean=mean_out,cov=cov_out))
+}
+
+lat2exp<- function(mean,cov){
+	mean <- as.matrix(mean)
+	cov <- as.matrix(cov)
+	
+	mean_out <- rep(NA,nrow(cov))
+	for(i in 1:nrow(cov)) mean_out[i] <- exp(mean[i]+ cov[i,i]/2)
+
+	cov_out <- matrix(NA,nrow(cov),ncol(cov))
+	for(i in 1:nrow(cov)){
+		for(j in 1:ncol(cov)) cov_out[i,j] <- exp(mean[i]+mean[j] + (cov[i,i]+cov[j,j])/2)*(exp(cov[i,j])-1)
+	}
+	return(list(mean=mean_out,cov=cov_out))
 }
