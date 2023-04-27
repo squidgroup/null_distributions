@@ -58,9 +58,9 @@ pois_mods <- function(dat){
 			y = data[,"y"],
 			ID = as.numeric(as.factor(data[,"ID"])))
 
-		stan_mod <- sampling(pois_stan, data=stan_dat, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID","sigma2_E"), refresh=0)
+		stan_mod <- sampling(pois_stan, data=stan_dat, chains=1,iter=5000, warmup=2000, pars=c("beta_0","sigma2_ID","sigma2_E"), refresh=0)
 		
-		list(summary = stan_out(stan_mod), data=data, post = as.data.frame(extract(stan_mod, permuted=FALSE)[,,1:2]))
+		list(summary = stan_out(stan_mod), data=data, post = as.data.frame(extract(stan_mod, permuted=FALSE)[,,1:3]))
 }
 
 Stack <- function(x, col2stack, value.name="value", group.name="group", levels=NULL){

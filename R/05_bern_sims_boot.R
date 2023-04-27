@@ -14,7 +14,7 @@ wd <- "~/github/null_distributions/"
 source(paste0(wd,"R/00_functions.R"))
 
 bern_stan <- stan_model(file = paste0(wd,"stan/simple_GLMM.stan"))
-pops <- 1:100
+pops <- 1:500
 ICCs <- c(0, 0.2, 0.4, 0.8)
 N_boot=100
 
@@ -48,7 +48,7 @@ for(j in ICCs){
 			actual=out[[i]]$summary,
 			bootstrap=bootstrap)
 
-	},mc.cores=4)
+	},mc.cores=8)
 
   # is it exists already, join them together and save the two	
 	file <- paste0("bern_boot_",j,".Rdata")
