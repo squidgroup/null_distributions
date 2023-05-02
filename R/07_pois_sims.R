@@ -22,11 +22,13 @@ ds <- make_structure(paste0("ID(80)"),repeat_obs=2)
 
 # between group variances 
 ICCs <- c(0, 0.1, 0.2, 0.4)
-intercept <- 1.5
-total_var <- 0.1
+intercept <- 2
+total_var <- 0.2
+## match median mean and variances from Pick et al 2023
 
-# exp2lat(5,2)
-# lat2exp(1.5,0.1)
+# (0.449*8.41)^2
+#  exp2lat(8.41,14)
+# lat2exp(2,0.2)
 
 # n=100000
 # x<-rpois(n,rlnorm(n,1.5,sqrt(0.1)))
@@ -60,7 +62,7 @@ for(ICC in ICCs){
 		out_mod<-pois_mods(dat[[i]])
 		out_mod[["param"]]<- c(pop=i,ICC=ICC, N_group=80, N_within=2)
 		out_mod
-	},mc.cores=8)
+	},mc.cores=4)
 	save(out, file=paste0(wd,"Data/Intermediate/pois_sims_",ICC,".Rdata"))
 		cat("\n\n")
 }

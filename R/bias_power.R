@@ -9,9 +9,10 @@ source(paste0(wd,"R/00_functions.R"))
 
 convert_func <- function(x){
 	param <- if(length(x$param)==4) x$param[2:4] else x$param
+	# param <-  x$param[2:4]
 	names(param) <-c("ICC", "N_group", "N_within")
 	c(param,
-		median_p = p_func(x$actual["median"],x$perm[,"median"]),
+		median_p = p_func(x$actual["median"],x$boot[,"median"]),
 		median_bias = as.numeric(x$actual["median"] - param["ICC"]),
 		median_rel_bias = as.numeric((x$actual["median"] - param["ICC"])/param["ICC"]),
 		mean_bias = as.numeric(x$actual["mean"] - param["ICC"]),
@@ -23,17 +24,57 @@ convert_func <- function(x){
 	)
 }
 
-files_p <- list.files(paste0(wd,"Data/Intermediate"))
-results_p <- files_p[grep("gaus_perm",files_p)]
-list_names_p <- gsub("gaus_perm_|.Rdata","",results_p)
+# files_p <- list.files(paste0(wd,"Data/Intermediate"))
+# results_p <- files_p[grep("gaus_perm",files_p)]
+# list_names_p <- gsub("gaus_perm_|.Rdata","",results_p)
 
-p_perm<-as.data.frame(do.call(rbind,lapply(results_p, function(i){
+# p_perm<-as.data.frame(do.call(rbind,lapply(results_p, function(i){
+#   load(paste0(wd,"Data/Intermediate/",i))
+#   t(sapply(perm_out, convert_func))
+# })))
+
+# head(p_perm)
+
+files <- list.files(paste0(wd,"Data/Intermediate"))
+
+results_gaus <- files[grep("gaus_boot",files)]
+p_gaus<-as.data.frame(do.call(rbind,lapply(results_gaus, function(i){
   load(paste0(wd,"Data/Intermediate/",i))
-  t(sapply(perm_out, convert_func))
+  boot_out<-lapply(boot_out, function(x) {
+  	x$param <- as.numeric(strsplit(gsub("gaus_boot_|.Rdata","",i),"_")[[1]])
+		x
+	})
+  t(sapply(boot_out, convert_func))
+})))
+
+results_bern <- files[grep("bern_boot",files)]
+p_bern<-as.data.frame(do.call(rbind,lapply(results_bern, function(i){
+  load(paste0(wd,"Data/Intermediate/",i))
+  # print(length(boot_out))
+  t(sapply(boot_out[101:600], convert_func))
+})))
+#   load(paste0(wd,"Data/Intermediate/pois_boot_0.1.Rdata"))
+# boot_out<-boot_out[201:400]
+# save(boot_out,file=paste0(wd,"Data/Intermediate/pois_boot_0.1.Rdata"))
+
+
+results_pois <- files[grep("pois_boot",files)]
+p_pois<-as.data.frame(do.call(rbind,lapply(results_pois, function(i){
+	## adjust ICC by total latent var
+  load(paste0(wd,"Data/Intermediate/",i))
+    boot_out<-lapply(boot_out, function(x) {
+  	x$param["ICC"] <- x$param["ICC"]*0.2
+		x
+	})
+  t(sapply(boot_out, convert_func))
 })))
 
 
-head(p_perm)
+# i<-results_gaus[1]
+# x<-boot_out[[1]]
+# names(boot_out)
+# convert_func(x)
+
 
 # power_dat <- aggregate(median_p~N_group+ N_within+ICC,p_perm,function(x) mean(x<0.05))
 
@@ -52,24 +93,25 @@ head(p_perm)
 
 
 # load(paste0(wd,"Data/Intermediate/GLMM_sim_null.Rdata"))
-load( file=paste0(wd,"Data/Intermediate/GLMM_sim.Rdata"))
+# load( file=paste0(wd,"Data/Intermediate/GLMM_sim.Rdata"))
 
-p_alt <- as.data.frame(t(sapply(results0.2, convert_func)))
+# p_alt <- as.data.frame(t(sapply(results0.2, convert_func)))
 
-p_null <- as.data.frame(t(sapply(results0, convert_func
-		)))
-head(p_null)
-
-
-
-load(paste0(wd,"Data/Intermediate/fay_results.Rdata"))
-results_sum <- t(sapply(results,colMeans))
+# p_null <- as.data.frame(t(sapply(results0, convert_func
+# 		)))
+# head(p_null)
 
 
 
-p_null$model <- p_alt$model <- "glmm"
-p_perm$model <- "lmm"
-all <- rbind(p_perm,p_alt,p_null)
+# load(paste0(wd,"Data/Intermediate/fay_results.Rdata"))
+# results_sum <- t(sapply(results,colMeans))
+
+
+
+p_bern$model <- "bern"
+p_pois$model <- "pois"
+p_gaus$model <- "gaus"
+all <- rbind(p_bern,p_gaus,p_pois)
 
 power_dat <- aggregate(median_p~N_group+ N_within+ICC+model,all,function(x) mean(x<0.05))
 bias_dat <- aggregate(cbind(median_bias,median_rel_bias,mean_bias,mean_rel_bias,mode1_bias,mode1_rel_bias,mode0.1_bias,mode0.1_rel_bias)~N_group+ N_within+ICC+model,all, mean)
@@ -79,10 +121,9 @@ bias_CIs <- aggregate(cbind(median_bias,median_rel_bias,mean_bias,mean_rel_bias,
 plot_function <- function(metric){
 	ylim <- range(bias_dat[,c("mean_rel_bias","median_rel_bias","mode1_rel_bias","mode0.1_rel_bias")], finite=TRUE)
 	code <- paste0(metric,"_rel_bias")
-	plot(power_dat$median_p,bias_dat[,code], pch=19, col=c(2,1)[as.factor(power_dat$model)], ylim=ylim, xlab="Power")
+	plot(power_dat$median_p,bias_dat[,code], pch=19, col=c(2,1,4)[as.factor(power_dat$model)], ylim=ylim, xlab="Power", ylab=paste(metric,"relative bias"))
 	abline(h=0, col="grey")
-	arrows(power_dat$median_p,bias_dat[,code] + bias_CIs[,code],power_dat$median_p,bias_dat[,code] - bias_CIs[,code], angle=90,code=3, length=0.05)
-	
+	arrows(power_dat$median_p,bias_dat[,code] + bias_CIs[,code],power_dat$median_p,bias_dat[,code] - bias_CIs[,code], angle=90,code=3, length=0.05, col=c(2,1,4)[as.factor(power_dat$model)])	
 }
 
 

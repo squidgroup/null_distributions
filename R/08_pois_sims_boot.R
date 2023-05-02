@@ -14,12 +14,15 @@ wd <- "~/github/null_distributions/"
 source(paste0(wd,"R/00_functions.R"))
 
 pois_stan <- stan_model(file = paste0(wd,"stan/simple_pois_GLMM.stan"))
-pops <- 1:500
-ICCs <- c(0, 0.1, 0.2, 0.4)
+pops <- 1:200
+ICCs <- c(0.1, 0)
 N_boot=100
 
-j<-0
-i=1
+## done the first 200 on 0.4 - need to be careful of overwriting if run more
+
+
+# j<-0
+# i=1
 for(j in ICCs){
 	cat("\n ICC:",j,"\n")
 
