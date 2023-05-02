@@ -137,5 +137,6 @@ plot_function("median")
 plot_function("mode1")
 
 plot_function("mode0.1")
+legend("topright", c("Gaussian","Poisson","Bernoulli"),pch=19, col=c(1,4,2))
 }
 

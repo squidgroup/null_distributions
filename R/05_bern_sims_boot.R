@@ -30,6 +30,7 @@ for(j in ICCs){
 		bs_dat_all<-simulate_population(
 			data_structure= make_structure("ID(80)",repeat_obs=4),
 			parameters = list(
+				intercept= median(out[[i]]$post[,"beta_0"]),			
 				ID=list(vcov=0),
 				residual=list(vcov=0)
 			),

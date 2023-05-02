@@ -131,15 +131,18 @@ dev.off()
 
 
 
-power_dat <- aggregate(cbind(median_boot,median_perm)~N_group+ N_within+ICC,all,function(x) mean(x<0.05))
+power_dat <- aggregate(cbind(mean_boot,mean_perm)~N_group+ N_within+ICC,all,function(x) mean(x<0.05))
 
-power_dat2 <- aggregate(cbind(median_boot,median_perm)~N_group+ N_within+ICC,all,mean)
+power_dat2 <- aggregate(cbind(mean_boot,mean_perm)~N_group+ N_within+ICC,all,mean)
 
 power_dat
 
-plot(power_dat$median_boot,power_dat2$median_boot)
+plot(power_dat$mean_boot,power_dat2$mean_boot)
+plot(power_dat$mean_perm,power_dat2$mean_perm, ylab="Mean p-value", xlab="Power")
 
-mu = seq(0,1,0.01)
-power = 1-(1-0.05)^(1/mu -1)
+alpha <- 1
+
+mu = seq(0,alpha,0.01)
+power = pbeta(0.05,1,(alpha/mu -alpha))#1-(1-0.05)^(1/mu -1)
 
 lines(mu~power)

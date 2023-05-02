@@ -108,3 +108,9 @@ lines(var_prior_U~I(x^2),type="l", col="blue")
 sd_prior_C <- dcauchy(x,0,2)
 var_prior_C <- sd_prior_C/(2*x)
 lines(var_prior_C~I(x^2),type="l", col="red")
+
+
+
+
+# hist(plogis(rnorm(10000,0,0.01)))
+# hist(rnorm(10000,0.5,0.01))

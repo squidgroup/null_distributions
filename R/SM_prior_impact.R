@@ -16,7 +16,7 @@ library(MCMCglmm)
 library(lme4)
 rstan_options("auto_write" = TRUE)
 
-wd <- "~/github/bayes_perm/"
+wd <- "~/github/null_distributions/"
 
 source(paste0(wd,"R/00_functions.R"))
 
@@ -171,7 +171,7 @@ if(run){
 	out<-prior_sim(n_pop=100, ICC=0.2, N_group=80, N_within=2, mc.cores=8)
 	save(out, file=paste0(wd,"Data/Intermediate/prior_impact2.Rdata"))
 }
-load(paste0(wd,"Data/Intermediate/prior_impact.Rdata"))
+load(paste0(wd,"Data/Intermediate/prior_impact2.Rdata"))
 
 # out <- mclapply(1:500,function(i){
 	
@@ -218,3 +218,5 @@ dev.off()
 
 plot(subset(out2,type=="mode0.1" & prior=="I")$estimate,subset(out2,type== "freq")$estimate)
 plot(subset(out2,type=="mode1" & prior=="I")$estimate,subset(out2,type== "freq")$estimate)
+
+
