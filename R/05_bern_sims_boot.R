@@ -15,7 +15,7 @@ source(paste0(wd,"R/00_functions.R"))
 
 bern_stan <- stan_model(file = paste0(wd,"stan/simple_GLMM.stan"))
 pops <- 1:500
-ICCs <- c(0, 0.2, 0.4, 0.8)
+ICCs <- c(0.2, 0.4, 0.8, 0)
 N_boot=100
 
 for(j in ICCs){
