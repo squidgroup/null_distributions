@@ -13,10 +13,10 @@ parameters{
 model{
   vector[N] mu = beta_0 + sigma_ID * ID_effects_scaled[ID];
 
-  target += normal_lpdf( ID_scaled| 0, 1)
-  target += normal_lpdf( beta_0| 0, 10)
-  target += cauchy_lpdf( sigma_ID| 0, 2)
-  target += cauchy_lpdf( sigma_E| 0, 2)
-  target += normal_lpdf( y| mu, sigma_E)
+  target += normal_lpdf( ID_scaled| 0, 1);
+  target += normal_lpdf( beta_0| 0, 10);
+  target += cauchy_lpdf( sigma_ID| 0, 2);
+  target += cauchy_lpdf( sigma_E| 0, 2);
+  target += normal_lpdf( y| mu, sigma_E);
 
 }

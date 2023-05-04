@@ -12,13 +12,17 @@ convert_func <- function(x){
 	# param <-  x$param[2:4]
 	names(param) <-c("ICC", "N_group", "N_within")
 	c(param,
+		median = as.numeric(x$actual["median"]),
 		median_p = p_func(x$actual["median"],x$boot[,"median"]),
 		median_bias = as.numeric(x$actual["median"] - param["ICC"]),
 		median_rel_bias = as.numeric((x$actual["median"] - param["ICC"])/param["ICC"]),
+		mean = as.numeric(x$actual["mean"]),
 		mean_bias = as.numeric(x$actual["mean"] - param["ICC"]),
 		mean_rel_bias = as.numeric((x$actual["mean"] - param["ICC"])/param["ICC"]),
+		mode1 = as.numeric(x$actual["mode1"]),		
 		mode1_bias = as.numeric(x$actual["mode1"] - param["ICC"]),
 		mode1_rel_bias = as.numeric((x$actual["mode1"] - param["ICC"])/param["ICC"]),
+		mode0.1 = as.numeric(x$actual["mode0.1"]),
 		mode0.1_bias = as.numeric(x$actual["mode0.1"] - param["ICC"]),
 		mode0.1_rel_bias = as.numeric((x$actual["mode0.1"] - param["ICC"])/param["ICC"])
 	)
@@ -51,7 +55,7 @@ results_bern <- files[grep("bern_boot",files)]
 p_bern<-as.data.frame(do.call(rbind,lapply(results_bern, function(i){
   load(paste0(wd,"Data/Intermediate/",i))
   # print(length(boot_out))
-  t(sapply(boot_out[101:600], convert_func))
+  t(sapply(boot_out[601:110], convert_func))
 })))
 #   load(paste0(wd,"Data/Intermediate/pois_boot_0.1.Rdata"))
 # boot_out<-boot_out[201:400]
@@ -117,6 +121,9 @@ power_dat <- aggregate(median_p~N_group+ N_within+ICC+model,all,function(x) mean
 bias_dat <- aggregate(cbind(median_bias,median_rel_bias,mean_bias,mean_rel_bias,mode1_bias,mode1_rel_bias,mode0.1_bias,mode0.1_rel_bias)~N_group+ N_within+ICC+model,all, mean)
 bias_CIs <- aggregate(cbind(median_bias,median_rel_bias,mean_bias,mean_rel_bias,mode1_bias,mode1_rel_bias,mode0.1_bias,mode0.1_rel_bias)~N_group+ N_within+ICC+model,all, function(x) 1.96*sd(x)/sqrt(length(x)))
 
+prec_dat <- aggregate(cbind(median,mean,mode1,mode0.1)~N_group+ N_within+ICC+model,all,function(x) 1/sd(x))
+prec_rel_dat <- aggregate(cbind(median,mean,mode1,mode0.1)~N_group+ N_within+ICC+model,all,function(x) mean(x)/sd(x))
+
 
 plot_function <- function(metric){
 	ylim <- range(bias_dat[,c("mean_rel_bias","median_rel_bias","mode1_rel_bias","mode0.1_rel_bias")], finite=TRUE)
@@ -124,6 +131,14 @@ plot_function <- function(metric){
 	plot(power_dat$median_p,bias_dat[,code], pch=19, col=c(2,1,4)[as.factor(power_dat$model)], ylim=ylim, xlab="Power", ylab=paste(metric,"relative bias"))
 	abline(h=0, col="grey")
 	arrows(power_dat$median_p,bias_dat[,code] + bias_CIs[,code],power_dat$median_p,bias_dat[,code] - bias_CIs[,code], angle=90,code=3, length=0.05, col=c(2,1,4)[as.factor(power_dat$model)])	
+}
+
+plot_function2 <- function(metric){
+	ylim <- range(bias_dat[,c("mean_rel_bias","median_rel_bias","mode1_rel_bias","mode0.1_rel_bias")], finite=TRUE)
+	code <- paste0(metric,"_rel_bias")
+	plot(prec_rel_dat[,metric],bias_dat[,code], pch=19, col=c(2,1,4)[as.factor(prec_rel_dat$model)], ylim=ylim, xlim=c(0,5), xlab="Relative Precision", ylab=paste(metric,"relative bias"))
+	abline(h=0, col="grey")
+	arrows(prec_rel_dat[,metric],bias_dat[,code] + bias_CIs[,code],prec_rel_dat[,metric],bias_dat[,code] - bias_CIs[,code], angle=90,code=3, length=0.05, col=c(2,1,4)[as.factor(prec_rel_dat$model)])	
 }
 
 
@@ -139,4 +154,29 @@ plot_function("mode1")
 plot_function("mode0.1")
 legend("topright", c("Gaussian","Poisson","Bernoulli"),pch=19, col=c(1,4,2))
 }
+
+{
+par(mfrow=c(2,2), mar=c(5,5,1,1))
+
+plot_function2("mean")
+
+plot_function2("median")
+
+plot_function2("mode1")
+
+plot_function2("mode0.1")
+legend("topright", c("Gaussian","Poisson","Bernoulli"),pch=19, col=c(1,4,2))
+}
+
+
+	plot(power_dat$median_p,prec_dat[,"median"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Power")
+
+	plot(power_dat$median_p,prec_rel_dat[,"median"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Power")
+
+	plot(power_dat$median_p,prec_rel_dat[,"mean"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Power")
+
+	plot(power_dat$median_p,prec_rel_dat[,"mode1"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Power")
+
+	plot(power_dat$median_p,prec_rel_dat[,"mode0.1"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Power")
+
 

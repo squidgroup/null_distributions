@@ -3,7 +3,7 @@ rm(list=ls())
 library("beeswarm")
 
 library(scales)
-wd <- "~/github/bayes_perm/"
+wd <- "~/github/null_distributions/"
 
 source(paste0(wd,"R/00_functions.R"))
 
@@ -32,6 +32,10 @@ actual<-as.data.frame(do.call(rbind,lapply(results, function(y){
 nrow(actual)
 
 precision<-aggregate(cbind(mode0.1,mode1,mean,median)~N_group+N_within+ICC,actual,function(x)1/sd(x))
+
+precision2<-aggregate(cbind(mode0.1,mode1,mean,median)~N_group+N_within+ICC,actual,function(x) mean(x)/sd(x))
+
+
 
 line_coords <- (1:7)*3+0.5
 
@@ -67,3 +71,36 @@ mtext("N within", side=1, line=-1.5, outer=TRUE, adj=0)
 }
 
 dev.off()
+
+
+precision3 <- precision
+precision3[,c("mean","median","mode1","mode0.1")] <- precision3[,c("mean","median","mode1","mode0.1")] * precision3$ICC
+
+{
+
+# line_coords <- (1:7)*3+0.5
+par(mfrow=c(1,1), mar=c(4,4,3,1))
+
+plot(precision2$mean, pch=20, ylim=c(0,10), ylab="Precision", xlab="", xaxt="n")
+abline(h=0)
+abline(v=line_coords, lty=c(2,1,2,1,2,1,2))
+
+points(precision2$median, pch=17,col="red")
+points(precision2$mode1, pch=15,col="blue")
+points(precision2$mode0.1, pch=18,col="green")
+
+axis(3,c(1,3.5,6),c("",0,""), lwd.ticks=0, line=1, padj=1)
+axis(3,c(1,3.5,6) + 6,c("",0.1,""), lwd.ticks=0, line=1, padj=1)
+axis(3,c(1,3.5,6) + 12,c("",0.2,""), lwd.ticks=0, line=1, padj=1)
+axis(3,c(1,3.5,6) + 18,c("",0.4,""), lwd.ticks=0, line=1, padj=1)
+mtext("ICC", side=3, line=-2, outer=TRUE, adj=0.05)
+
+
+axis(1,1:24,rep(c(20,40,80),8))
+axis(1,1:8 *3 -1,rep(c(2,4),4), tick=FALSE, line=1.5)
+
+mtext("N among", side=1, line=-3, outer=TRUE, adj=0)
+mtext("N within", side=1, line=-1.5, outer=TRUE, adj=0)
+ legend("topleft",c("mean","median","mode-1","mode-0.1"), pch=c(20,17,15,18), col=c(1,2,4,3), bty="n")
+
+}
