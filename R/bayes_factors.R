@@ -1,11 +1,11 @@
-library(c)
+library(bridgesampling)
 library(rstan)
 
 ### generate data ###
 set.seed(12345)
 
 mu <- 0
-tau2 <- 0
+tau2 <- 0.5
 sigma2 <- 1
 
 n_pop=1
@@ -70,9 +70,9 @@ stan_dat <- list(
 
 # fit models
 stanfitH0 <- sampling(stanmodelH0, data = stan_dat,
-                      iter = 2000, warmup = 1000, chains = 3, cores = 1)
+                      iter = 15000, warmup = 2000, chains = 3, cores = 3)
 stanfitH1 <- sampling(stanmodelH1, data = stan_dat,
-                      iter = 2000, warmup = 1000, chains = 3, cores = 1)
+                      iter = 15000, warmup = 2000, chains = 3, cores = 3)
 
 # compute log marginal likelihood via bridge sampling for H0
 H0.bridge <- bridge_sampler(stanfitH0, silent = TRUE)

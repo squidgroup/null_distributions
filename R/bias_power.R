@@ -74,55 +74,19 @@ p_pois<-as.data.frame(do.call(rbind,lapply(results_pois, function(i){
 })))
 
 
-# i<-results_gaus[1]
-# x<-boot_out[[1]]
-# names(boot_out)
-# convert_func(x)
-
-
-# power_dat <- aggregate(median_p~N_group+ N_within+ICC,p_perm,function(x) mean(x<0.05))
-
-# bias_dat <- aggregate(cbind(median_bias,median_rel_bias,mode_bias,mode_rel_bias)~N_group+ N_within+ICC,p_perm, mean)
-
-# # plot(power_dat$median_p,bias_dat$median_bias)
-# plot(power_dat$median_p,bias_dat$median_rel_bias)
-
-# plot(power_dat$median_p,bias_dat$mode_rel_bias)
-# # plot(power_dat$median_p,bias_dat$mode_bias)
-
-
-## plot GLMM results on here - would help show its a power issue
-
-
-
-
-# load(paste0(wd,"Data/Intermediate/GLMM_sim_null.Rdata"))
-# load( file=paste0(wd,"Data/Intermediate/GLMM_sim.Rdata"))
-
-# p_alt <- as.data.frame(t(sapply(results0.2, convert_func)))
-
-# p_null <- as.data.frame(t(sapply(results0, convert_func
-# 		)))
-# head(p_null)
-
-
-
-# load(paste0(wd,"Data/Intermediate/fay_results.Rdata"))
-# results_sum <- t(sapply(results,colMeans))
-
-
-
 p_bern$model <- "bern"
 p_pois$model <- "pois"
 p_gaus$model <- "gaus"
 all <- rbind(p_bern,p_gaus,p_pois)
 
+
+
+
+
+
 power_dat <- aggregate(median_p~N_group+ N_within+ICC+model,all,function(x) mean(x<0.05))
 bias_dat <- aggregate(cbind(median_bias,median_rel_bias,mean_bias,mean_rel_bias,mode1_bias,mode1_rel_bias,mode0.1_bias,mode0.1_rel_bias)~N_group+ N_within+ICC+model,all, mean)
 bias_CIs <- aggregate(cbind(median_bias,median_rel_bias,mean_bias,mean_rel_bias,mode1_bias,mode1_rel_bias,mode0.1_bias,mode0.1_rel_bias)~N_group+ N_within+ICC+model,all, function(x) 1.96*sd(x)/sqrt(length(x)))
-
-prec_dat <- aggregate(cbind(median,mean,mode1,mode0.1)~N_group+ N_within+ICC+model,all,function(x) 1/sd(x))
-prec_rel_dat <- aggregate(cbind(median,mean,mode1,mode0.1)~N_group+ N_within+ICC+model,all,function(x) mean(x)/sd(x))
 
 
 plot_function <- function(metric){
@@ -133,13 +97,6 @@ plot_function <- function(metric){
 	arrows(power_dat$median_p,bias_dat[,code] + bias_CIs[,code],power_dat$median_p,bias_dat[,code] - bias_CIs[,code], angle=90,code=3, length=0.05, col=c(2,1,4)[as.factor(power_dat$model)])	
 }
 
-plot_function2 <- function(metric){
-	ylim <- range(bias_dat[,c("mean_rel_bias","median_rel_bias","mode1_rel_bias","mode0.1_rel_bias")], finite=TRUE)
-	code <- paste0(metric,"_rel_bias")
-	plot(prec_rel_dat[,metric],bias_dat[,code], pch=19, col=c(2,1,4)[as.factor(prec_rel_dat$model)], ylim=ylim, xlim=c(0,5), xlab="Relative Precision", ylab=paste(metric,"relative bias"))
-	abline(h=0, col="grey")
-	arrows(prec_rel_dat[,metric],bias_dat[,code] + bias_CIs[,code],prec_rel_dat[,metric],bias_dat[,code] - bias_CIs[,code], angle=90,code=3, length=0.05, col=c(2,1,4)[as.factor(prec_rel_dat$model)])	
-}
 
 
 {
@@ -153,6 +110,22 @@ plot_function("mode1")
 
 plot_function("mode0.1")
 legend("topright", c("Gaussian","Poisson","Bernoulli"),pch=19, col=c(1,4,2))
+}
+
+
+
+## Relative Precision and relative bias
+
+prec_dat <- aggregate(cbind(median,mean,mode1,mode0.1)~N_group+ N_within+ICC+model,all,function(x) 1/sd(x))
+prec_rel_dat <- aggregate(cbind(median,mean,mode1,mode0.1)~N_group+ N_within+ICC+model,all,function(x) mean(x)/sd(x))
+
+
+plot_function2 <- function(metric){
+	ylim <- range(bias_dat[,c("mean_rel_bias","median_rel_bias","mode1_rel_bias","mode0.1_rel_bias")], finite=TRUE)
+	code <- paste0(metric,"_rel_bias")
+	plot(prec_rel_dat[,metric],bias_dat[,code], pch=19, col=c(2,1,4)[as.factor(prec_rel_dat$model)], ylim=ylim, xlim=c(0,5), xlab="Relative Precision", ylab=paste(metric,"relative bias"))
+	abline(h=0, col="grey")
+	arrows(prec_rel_dat[,metric],bias_dat[,code] + bias_CIs[,code],prec_rel_dat[,metric],bias_dat[,code] - bias_CIs[,code], angle=90,code=3, length=0.05, col=c(2,1,4)[as.factor(prec_rel_dat$model)])	
 }
 
 {
@@ -180,3 +153,45 @@ legend("topright", c("Gaussian","Poisson","Bernoulli"),pch=19, col=c(1,4,2))
 	plot(power_dat$median_p,prec_rel_dat[,"mode0.1"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Power")
 
 
+
+
+
+##### p distribution
+
+
+p_mean_dat <- aggregate(median_p~N_group+ N_within+ICC+model,all,mean)
+
+p_var_dat <- aggregate(median_p~N_group+ N_within+ICC+model,all,var)
+
+
+setEPS()
+pdf(paste0(wd,"Figures/FigSM_p_dist.pdf"), height=5, width=10)
+
+{
+par(mfrow=c(1,2), mar=c(5,5,1,1), cex.axis=0.75, mgp=c(2,0.5,0))
+plot(power_dat$median_p,p_mean_dat$median_p, pch=c(17,rep(19,7))[as.factor(power_dat$ICC)], col=c(2,1,4)[as.factor(power_dat$model)], ylab="Mean p-value", xlab="Power")
+
+plot(power_dat$median_p,p_var_dat$median_p, pch=c(17,rep(19,7))[as.factor(power_dat$ICC)], col=c(2,1,4)[as.factor(power_dat$model)], ylab="Variance in p-values", xlab="Power")
+
+legend("topright", c("Gaussian","Poisson","Bernoulli"),pch=19, col=c(1,4,2))
+}
+dev.off()
+
+
+
+
+# alpha <- 1
+# mu = seq(0,alpha,0.01)
+# power = pbeta(0.05,1,(alpha/mu -alpha))#1-(1-0.05)^(1/mu -1)
+# lines(mu~power)
+
+
+
+# plot(power_dat2$median_p,power_dat3$median_p, pch=19, col=c(2,1,4)[as.factor(power_dat$model)], ylab="Variance in p-values", xlab="Mean p-value")
+
+# mu = seq(0,0.5,0.01)
+#  V = (mu^2-mu^3)/(1+mu)
+#  lines(V~mu)
+
+# alpha <- 1
+# V = mu

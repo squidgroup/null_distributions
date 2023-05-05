@@ -63,13 +63,13 @@ abline(0,1)
 {
 par(mfrow=c(2,2))
 	plot((results$z_median),results$median_p, pch=19, cex=0.05, col=scales::alpha(1,0.5))
-	abline(h=0.05)
+	abline(h=0.05, v=qnorm(0.95))
 plot(results$z_mean,results$median_p, pch=19, cex=0.05, col=scales::alpha(1,0.5))
-abline(h=0.05)
+abline(h=0.05, v=qnorm(0.95))
 plot(results$z_mode1,results$median_p, pch=19, cex=0.05, col=scales::alpha(1,0.5))
-abline(h=0.05)
+abline(h=0.05, v=qnorm(0.95))
 plot(results$z_mode0.1,results$median_p, pch=19, cex=0.05, col=scales::alpha(1,0.5))
-abline(h=0.05)
+abline(h=0.05, v=qnorm(0.95))
 }
 
 cor(results$z,results$median_p)
@@ -77,13 +77,13 @@ cor(results$z,results$median_p)
 {
 par(mfrow=c(2,2))
 	plot((results$median_zp),results$median_p, pch=19, cex=0.05, col=scales::alpha(1,0.5))
-	abline(h=0.05)
+	abline(h=0.05,v=0.05)
 plot(results$mean_zp,results$median_p, pch=19, cex=0.05, col=scales::alpha(1,0.5))
-abline(h=0.05)
+abline(h=0.05,v=0.05)
 plot(results$mean_zp,results$median_zp, pch=19, cex=0.05, col=scales::alpha(1,0.5))
 abline(0,1)
 # plot(results$z_mode0.1,results$median_p, pch=19, cex=0.05, col=scales::alpha(1,0.5))
-# abline(h=0.05)
+# abline(h=0.05,v=0.05)
 }
 
 
