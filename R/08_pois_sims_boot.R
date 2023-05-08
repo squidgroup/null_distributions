@@ -14,8 +14,8 @@ wd <- "~/github/null_distributions/"
 source(paste0(wd,"R/00_functions.R"))
 
 pois_stan <- stan_model(file = paste0(wd,"stan/simple_pois_GLMM.stan"))
-pops <- 301:500
-ICCs <- c(0.1, 0.2, 0.4)
+pops <- 1:500
+ICCs <- c(0)
 N_boot=100
 
 
