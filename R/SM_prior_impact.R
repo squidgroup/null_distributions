@@ -194,13 +194,13 @@ aggregate(estimate~prior+type,out2,mean)
 
 prior_plot <- function(stat, ...){
 	dat <- rbind(subset(out2,type=="freq"),subset(out2,type==stat))
-	beeswarm(estimate~prior2,dat, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("REML","Improper","U(0,25)-var","C(0,2)","C(0,5)","C(0,25)","N(0,1)","U(0,5)","U(0,25)"), ylab="Estimate",... )
+	beeswarm(estimate~prior2,dat, pch=19, cex=0.5, col=alpha(1,0.3),method = "compactswarm",corral="wrap",xlab="Prior", labels=c("REML","Improper","U(0,25)","C(0,2)","C(0,5)","C(0,25)","N(0,1)","U(0,5)","U(0,25)"), ylab="Estimate",... )
 	abline(h=0.2, col="red")
-	points(aggregate(estimate~prior2,dat,mean)$estimate, cex=1.5, pch=19, col=c("blue",rep("orange",7)))
+	points(aggregate(estimate~prior2,dat,mean)$estimate, cex=1.5, pch=19, col=c("blue",rep("purple",2),rep("orange",6)))
 }
 
 setEPS()
-pdf(paste0(wd,"Figures/FigSM_prior.pdf"), height=9, width=11)
+pdf(paste0(wd,"Figures/FigSM_prior.pdf"), height=11, width=9)
 {
 # par(mfrow=c(2,2))
 	par(mfrow=c(4,1))
