@@ -51,12 +51,16 @@ p_gaus<-as.data.frame(do.call(rbind,lapply(results_gaus, function(i){
   t(sapply(boot_out, convert_func))
 })))
 
+
 results_bern <- files[grep("bern_boot",files)]
 p_bern<-as.data.frame(do.call(rbind,lapply(results_bern, function(i){
   load(paste0(wd,"Data/Intermediate/",i))
   # print(length(boot_out))
-  t(sapply(boot_out[601:110], convert_func))
+  t(sapply(boot_out, convert_func))
 })))
+
+
+
 #   load(paste0(wd,"Data/Intermediate/pois_boot_0.1.Rdata"))
 # boot_out<-boot_out[201:400]
 # save(boot_out,file=paste0(wd,"Data/Intermediate/pois_boot_0.1.Rdata"))
@@ -90,7 +94,8 @@ bias_CIs <- aggregate(cbind(median_bias,median_rel_bias,mean_bias,mean_rel_bias,
 
 
 plot_function <- function(metric){
-	ylim <- range(bias_dat[,c("mean_rel_bias","median_rel_bias","mode1_rel_bias","mode0.1_rel_bias")], finite=TRUE)
+	# ylim <- range(bias_dat[,c("mean_rel_bias","median_rel_bias","mode1_rel_bias","mode0.1_rel_bias")], finite=TRUE)
+	ylim <- c(-1,1.5)
 	code <- paste0(metric,"_rel_bias")
 	plot(power_dat$median_p,bias_dat[,code], pch=19, col=c(2,1,4)[as.factor(power_dat$model)], ylim=ylim, xlab="Power", ylab=paste(metric,"relative bias"))
 	abline(h=0, col="grey")
@@ -99,8 +104,10 @@ plot_function <- function(metric){
 
 
 
+setEPS()
+pdf(paste0(wd,"Figures/Fig6_power_bias.pdf"), height=8, width=10)
 {
-par(mfrow=c(2,2), mar=c(5,5,1,1))
+par(mfrow=c(2,2), mar=c(4,4,1,1), cex.axis=1,cex.lab=1.25, mgp=c(2,0.5,0))
 
 plot_function("mean")
 
@@ -109,8 +116,9 @@ plot_function("median")
 plot_function("mode1")
 
 plot_function("mode0.1")
-legend("topright", c("Gaussian","Poisson","Bernoulli"),pch=19, col=c(1,4,2))
+legend("topright", c("Gaussian","Poisson","Bernoulli"),pch=19, col=c(1,4,2), cex=1.25)
 }
+dev.off()
 
 
 
@@ -120,38 +128,47 @@ prec_dat <- aggregate(cbind(median,mean,mode1,mode0.1)~N_group+ N_within+ICC+mod
 prec_rel_dat <- aggregate(cbind(median,mean,mode1,mode0.1)~N_group+ N_within+ICC+model,all,function(x) mean(x)/sd(x))
 
 
-plot_function2 <- function(metric){
-	ylim <- range(bias_dat[,c("mean_rel_bias","median_rel_bias","mode1_rel_bias","mode0.1_rel_bias")], finite=TRUE)
+plot_function2 <- function(metric,...){
+	# ylim <- range(bias_dat[,c("mean_rel_bias","median_rel_bias","mode1_rel_bias","mode0.1_rel_bias")], finite=TRUE)
+	ylim <- c(-1,1.5)
 	code <- paste0(metric,"_rel_bias")
-	plot(prec_rel_dat[,metric],bias_dat[,code], pch=19, col=c(2,1,4)[as.factor(prec_rel_dat$model)], ylim=ylim, xlim=c(0,5), xlab="Relative Precision", ylab=paste(metric,"relative bias"))
+	plot(prec_rel_dat[,metric],bias_dat[,code], pch=19, col=c(2,1,4)[as.factor(prec_rel_dat$model)], ylim=ylim, xlim=c(0,5), xlab="Relative Precision", ylab="Relative bias",...)
 	abline(h=0, col="grey")
 	arrows(prec_rel_dat[,metric],bias_dat[,code] + bias_CIs[,code],prec_rel_dat[,metric],bias_dat[,code] - bias_CIs[,code], angle=90,code=3, length=0.05, col=c(2,1,4)[as.factor(prec_rel_dat$model)])	
 }
 
+
+setEPS()
+pdf(paste0(wd,"Figures/FigSM_precision_bias.pdf"), height=8, width=10)
 {
-par(mfrow=c(2,2), mar=c(5,5,1,1))
+par(mfrow=c(2,2), mar=c(3,3,3,1), cex.axis=1,cex.lab=1.25, mgp=c(2,0.5,0))
+plot_function2("mean", main="Mean")
 
-plot_function2("mean")
+plot_function2("median", main="Median")
 
-plot_function2("median")
+plot_function2("mode1", main="Mode-1")
 
-plot_function2("mode1")
-
-plot_function2("mode0.1")
+plot_function2("mode0.1", main="Mode-0.1")
 legend("topright", c("Gaussian","Poisson","Bernoulli"),pch=19, col=c(1,4,2))
 }
+dev.off()
 
+	# plot(power_dat$median_p,prec_dat[,"median"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Power")
 
-	plot(power_dat$median_p,prec_dat[,"median"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Power")
+setEPS()
+pdf(paste0(wd,"Figures/FigSM_precision_power.pdf"), height=8, width=10)
+{
+par(mfrow=c(2,2), mar=c(3,3,3,1), cex.axis=1,cex.lab=1.25, mgp=c(2,0.5,0))
+	
+	plot(power_dat$median_p,prec_rel_dat[,"mean"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Relative Precision",  ylab="Power", ylim=c(0,5), main="Mean")
 
-	plot(power_dat$median_p,prec_rel_dat[,"median"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Power")
+	plot(power_dat$median_p,prec_rel_dat[,"median"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Relative Precision",  ylab="Power", ylim=c(0,5), main="Median")
 
-	plot(power_dat$median_p,prec_rel_dat[,"mean"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Power")
+	plot(power_dat$median_p,prec_rel_dat[,"mode1"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Relative Precision",  ylab="Power", ylim=c(0,5), main="Mode-1")
 
-	plot(power_dat$median_p,prec_rel_dat[,"mode1"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Power")
-
-	plot(power_dat$median_p,prec_rel_dat[,"mode0.1"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Power")
-
+	plot(power_dat$median_p,prec_rel_dat[,"mode0.1"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Relative Precision",  ylab="Power", ylim=c(0,5), main="Mode-0.1")
+}
+dev.off()
 
 
 
@@ -173,7 +190,7 @@ plot(power_dat$median_p,p_mean_dat$median_p, pch=c(17,rep(19,7))[as.factor(power
 
 plot(power_dat$median_p,p_var_dat$median_p, pch=c(17,rep(19,7))[as.factor(power_dat$ICC)], col=c(2,1,4)[as.factor(power_dat$model)], ylab="Variance in p-values", xlab="Power")
 
-legend("topright", c("Gaussian","Poisson","Bernoulli"),pch=19, col=c(1,4,2))
+legend("topright", c("Gaussian","Poisson","Bernoulli","ICC > 0","ICC = 0"),pch=c(rep(19,4),17), col=c(1,4,2,"grey","grey"))
 }
 dev.off()
 
