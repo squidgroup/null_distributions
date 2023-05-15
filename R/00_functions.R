@@ -15,6 +15,21 @@ stan_out <- function(model){
 	out	
 }
 
+stan_out2 <- function(model){
+	group1 <- c(
+		post_mode(extract(model)$sigma2_group1,adjust=0.1),
+		post_mode(extract(model)$sigma2_group1,adjust=1), 
+		median(extract(model)$sigma2_group1),
+		summary(model)$summary["sigma2_group1",c(1,4,8,9)])
+	group2 <- c(
+		post_mode(extract(model)$sigma2_group2,adjust=0.1),
+		post_mode(extract(model)$sigma2_group2,adjust=1), 
+		median(extract(model)$sigma2_group2),
+		summary(model)$summary["sigma2_group2",c(1,4,8,9)])
+	names(group1) <- names(group2) <- c("mode0.1","mode1","median","mean","LCI","UCI","ESS")
+	cbind(group1,group2)	
+}
+
 gaussian_mods <- function(dat){
 		data <- dat[,c("y","ID")]
 		data$ID <- as.numeric(as.factor(data$ID))
@@ -31,6 +46,23 @@ gaussian_mods <- function(dat){
 		stan_mod <- sampling(LMM_stan, data=stan_dat, chains=1,iter=5000, warmup=2000, pars=c("sigma2_ID","sigma2_E"), refresh=0)
 		
 		list(summary = c(freq=as.numeric(summary(modF)$varcor),stan_out(stan_mod)), data=data, post = as.data.frame(extract(stan_mod, permuted=FALSE)[,,1:2]))
+}
+
+gaussian_mods2 <- function(dat){
+		data <- dat[,c("y","group1","group2")]
+
+		stan_dat <- list(
+			N = nrow(data),
+			N_group1 = length(unique(data[,"group1"])),
+			N_group2 = length(unique(data[,"group2"])),
+			y = data[,"y"],
+			group1 = as.numeric(as.factor(data[,"group1"])),
+			group2 = as.numeric(as.factor(data[,"group2"])),
+			cauchy_scale=2)
+
+		stan_mod <- sampling(LMM_stan, data=stan_dat, chains=1,iter=5000, warmup=2000, pars=c("sigma2_group1","sigma2_group2","sigma2_E"), refresh=0)
+		
+		list(summary = stan_out2(stan_mod), data=data, post = as.data.frame(extract(stan_mod, permuted=FALSE)[,,1:3]))
 }
 
 bern_mods <- function(dat){
