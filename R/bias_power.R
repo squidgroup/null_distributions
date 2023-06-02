@@ -160,13 +160,15 @@ pdf(paste0(wd,"Figures/FigSM_precision_power.pdf"), height=8, width=10)
 {
 par(mfrow=c(2,2), mar=c(3,3,3,1), cex.axis=1,cex.lab=1.25, mgp=c(2,0.5,0))
 	
-	plot(power_dat$median_p,prec_rel_dat[,"mean"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Relative Precision",  ylab="Power", ylim=c(0,5), main="Mean")
+	plot(power_dat$median_p,prec_rel_dat[,"mean"], pch=c(17,rep(19,7))[as.factor(power_dat$ICC)], col=c(2,1,4)[as.factor(power_dat$model)],  ylab="Relative Precision",  xlab="Power / FPR", ylim=c(0,5), main="Mean")
 
-	plot(power_dat$median_p,prec_rel_dat[,"median"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Relative Precision",  ylab="Power", ylim=c(0,5), main="Median")
+	plot(power_dat$median_p,prec_rel_dat[,"median"], pch=c(17,rep(19,7))[as.factor(power_dat$ICC)], col=c(2,1,4)[as.factor(power_dat$model)],  ylab="Relative Precision",  xlab="Power / FPR", ylim=c(0,5), main="Median")
 
-	plot(power_dat$median_p,prec_rel_dat[,"mode1"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Relative Precision",  ylab="Power", ylim=c(0,5), main="Mode-1")
+	plot(power_dat$median_p,prec_rel_dat[,"mode1"], pch=c(17,rep(19,7))[as.factor(power_dat$ICC)], col=c(2,1,4)[as.factor(power_dat$model)],  ylab="Relative Precision",  xlab="Power / FPR", ylim=c(0,5), main="Mode-1")
 
-	plot(power_dat$median_p,prec_rel_dat[,"mode0.1"], pch=19, col=c(2,1,4)[as.factor(power_dat$model)],  xlab="Relative Precision",  ylab="Power", ylim=c(0,5), main="Mode-0.1")
+	plot(power_dat$median_p,prec_rel_dat[,"mode0.1"], pch=c(17,rep(19,7))[as.factor(power_dat$ICC)], col=c(2,1,4)[as.factor(power_dat$model)],  ylab="Relative Precision",  xlab="Power / FPR", ylim=c(0,5), main="Mode-0.1")
+
+legend("topleft", c("Gaussian","Poisson","Bernoulli","ICC > 0","ICC = 0"),pch=c(rep(19,4),17), col=c(1,4,2,"grey","grey"))
 }
 dev.off()
 
