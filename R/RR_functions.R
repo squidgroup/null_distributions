@@ -57,12 +57,7 @@ mod<-function(x){
   nt <- 1 ## Thinning interval
   nb <- 500 ## Number of iterations to discard
   
-  stan_data = list(n = nrow(x),
-                   n_ind=max(x$individual),
-                   individual=x$individual,
-                   x=x$environment,
-                   y=x$y)
-  
-  md <- stan("Stan/RR_example.stan", data = stan_data, pars = params, chains = nc, iter = ni,  warmup = nb, thin = nt, cores=1)
-  round(summary(md)$summary[3,1],3)
+  md <- sampling(stan_md, data = stan_data, pars = params, chains = nc, iter = ni,  warmup = nb, thin = nt, cores=1, refresh=0)
+  median(extract(md)[["sigma2_I2"]])
+
 }
