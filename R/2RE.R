@@ -33,27 +33,58 @@ sim_dat_both<-simulate_population(
 	parameters= list(residual=list(vcov=median(rowSums(out_mod$post)))),
 	n_pop=N_sim
 )
+sim_dat_both_2 <- get_population_data(sim_dat_both, list=TRUE)
 
-sim_mod_both <- mclapply(get_population_data(1:N_sim, list=TRUE),function(j){ 
-	gaussian_mods2(sim_dat_both[[j]])$summary
+sim_mod_both <- mclapply(1:N_sim,function(j){ 
 	cat(j," ")
+	gaussian_mods2(sim_dat_both_2[[j]])$summary
 },mc.cores=8)
 
 
 sim_dat_group1<-simulate_population(
 	data_structure= data[,c("group1","group2")],
-	parameters= list(residual=list(vcov=median(rowSums(out_mod$post)))),
+	parameters= list(
+		group2=list(vcov=out_mod$summary["median","group2"]),
+		residual=list(vcov=median(rowSums(out_mod$post[,c(1,3)])))
+	),
 	n_pop=N_sim
 )
+sim_dat_group1_2<- get_population_data(sim_dat_group1, list=TRUE)
+
+sim_mod_group1 <- mclapply(1:N_sim,function(j){ 
+	cat(j," ")
+	gaussian_mods2(sim_dat_group1_2[[j]])$summary
+},mc.cores=8)
+
 
 sim_dat_group2<-simulate_population(
 	data_structure= data[,c("group1","group2")],
-	parameters= list(residual=list(vcov=median(rowSums(out_mod$post)))),
+	parameters= list(
+		group1=list(vcov=out_mod$summary["median","group1"]),
+		residual=list(vcov=median(rowSums(out_mod$post[,c(2,3)])))
+	),
 	n_pop=N_sim
 )
+sim_dat_group2_2<-get_population_data(sim_dat_group2, list=TRUE)
+
+sim_mod_group2 <- mclapply(1:N_sim,function(j){ 
+	cat(j," ")
+	gaussian_mods2(sim_dat_group2_2[[j]])$summary
+},mc.cores=8)
 
 
-null <- sapply(bootstrap, function(x)x["median","group1"])
-	p_func(out_mod$summary["median","group1"],null)
-hist(null)
+null_both1 <- sapply(sim_mod_both, function(x)x["median","group1"])
+null_both2 <- sapply(sim_mod_both, function(x)x["median","group2"])
+
+null_1 <- sapply(sim_mod_group1, function(x)x["median","group1"])
+null_2 <- sapply(sim_mod_group2, function(x)x["median","group2"])
+
+p_func(out_mod$summary["median","group1"],null_both1)
+p_func(out_mod$summary["median","group2"],null_both2)
+p_func(out_mod$summary["median","group1"],null_1)
+p_func(out_mod$summary["median","group2"],null_2)
+
+nulls <- data.frame(null=c(null_both1,null_both2,null_1,null_2),dist=rep(c("1both","2both","1","2"),each=100))
+
+beeswarm::beeswarm(null~dist,nulls, pch=19, cex=0.5, col=alpha(1,0.2),method = "compactswarm",corral="wrap")
 

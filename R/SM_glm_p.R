@@ -2,7 +2,7 @@ rm(list=ls())
 
 library(beeswarm)
 library(scales)
-wd <- "~/github/bayes_perm/"
+wd <- "~/github/null_distributions/"
 source(paste0(wd,"R/00_functions.R"))
 
 hist(boot::inv.logit(rnorm(100000,0,sqrt(0.2))), breaks=50)

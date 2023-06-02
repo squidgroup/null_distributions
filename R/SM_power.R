@@ -3,7 +3,7 @@ rm(list=ls())
 library(scales)
 library(beeswarm)
 
-wd <- "~/github/bayes_perm/"
+wd <- "~/github/null_distributions/"
 
 source(paste0(wd,"R/00_functions.R"))
 
@@ -66,14 +66,14 @@ col=alpha(1,0.3)
 
 
 ICCs <- c(0,0.1,0.2,0.4)
-	power_dat <- aggregate(cbind(mode1_boot,mode0.1_boot,mean_boot,median_boot,median_perm)~N_group+ N_within+ICC,all,function(x) mean(x<0.05)
+power_dat <- aggregate(cbind(mode1_boot,mode0.1_boot,mean_boot,median_boot,median_perm)~N_group+ N_within+ICC,all,function(x) mean(x<0.05))
 
 setEPS()
 pdf(paste0(wd,"Figures/FigSM_power_comp.pdf"), height=5, width=10)
 
 	{
 		par(mfrow=c(1,2),mar=c(4,4,2,1), cex.axis=0.75, mgp=c(2,0.5,0))
-		plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power",  ylim=c(0,1))
+		plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power / FPR",  ylim=c(0,1))
 		abline(h=0.05, col="grey")
 		# abline(h=c(0.025,0.075), col="grey")
 		legend("topleft",c("median","mean","mode1","mode0.1"), pch=c(18,19,17,15), col="grey",pt.bg=c("grey"), bty="n")
@@ -91,7 +91,7 @@ text(rep(65,4),c(0.1,0.25,0.55,0.97),c("ICC=0","ICC=0.1","ICC=0.2","ICC=0.4"), c
 			# lines(mean_boot~N_group,power_dat, subset=ICC==ICCs[j], col=j, lwd=2)
 		}
 		
-			plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power",  ylim=c(0,1))
+			plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power / FPR",  ylim=c(0,1))
 			abline(h=0.05, col="grey")
 			# abline(h=c(0.028,0.081), col="grey")
 			for(j in seq_along(ICCs)){

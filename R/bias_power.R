@@ -186,9 +186,9 @@ pdf(paste0(wd,"Figures/FigSM_p_dist.pdf"), height=5, width=10)
 
 {
 par(mfrow=c(1,2), mar=c(5,5,1,1), cex.axis=0.75, mgp=c(2,0.5,0))
-plot(power_dat$median_p,p_mean_dat$median_p, pch=c(17,rep(19,7))[as.factor(power_dat$ICC)], col=c(2,1,4)[as.factor(power_dat$model)], ylab="Mean p-value", xlab="Power")
+plot(power_dat$median_p,p_mean_dat$median_p, pch=c(17,rep(19,7))[as.factor(power_dat$ICC)], col=c(2,1,4)[as.factor(power_dat$model)], ylab="Mean p-value", xlab="Power / FPR")
 
-plot(power_dat$median_p,p_var_dat$median_p, pch=c(17,rep(19,7))[as.factor(power_dat$ICC)], col=c(2,1,4)[as.factor(power_dat$model)], ylab="Variance in p-values", xlab="Power")
+plot(power_dat$median_p,p_var_dat$median_p, pch=c(17,rep(19,7))[as.factor(power_dat$ICC)], col=c(2,1,4)[as.factor(power_dat$model)], ylab="Variance in p-values", xlab="Power / FPR")
 
 legend("topright", c("Gaussian","Poisson","Bernoulli","ICC > 0","ICC = 0"),pch=c(rep(19,4),17), col=c(1,4,2,"grey","grey"))
 }
