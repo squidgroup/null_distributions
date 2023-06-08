@@ -67,7 +67,7 @@ abline(h=0)
 abline(v=line_coords, lty=line_lty)
 points(bias$median_bias, cex=pt.cex,pch=17,col="red")
 points(bias$mode1_bias, cex=pt.cex,pch=15,col="blue")
-points(bias$mode0.1_bias, cex=pt.cex,pch=18,col="green")
+points(bias$mode0.1_bias, cex=pt.cex,pch=18,col="orange")
 axis(4)
 mtext("a)",2,padj=-8.5, las=1, line=3)
 
@@ -92,7 +92,7 @@ abline(h=0)
 abline(v=line_coords, lty=line_lty)
 points(relative_bias$median_rel_bias*100, cex=pt.cex,pch=17,col="red")
 points(relative_bias$mode1_rel_bias*100, cex=pt.cex,pch=15,col="blue")
-points(relative_bias$mode0.1_rel_bias*100, cex=pt.cex,pch=18,col="green")
+points(relative_bias$mode0.1_rel_bias*100, cex=pt.cex,pch=18,col="orange")
 axis(4)
 mtext("b)",2,padj=-8.5, las=1, line=3)
 
@@ -102,7 +102,7 @@ abline(h=0)
 abline(v=line_coords, lty=line_lty)
 points(prec_rel_dat$median, cex=pt.cex,pch=17,col="red")
 points(prec_rel_dat$mode1, cex=pt.cex,pch=15,col="blue")
-points(prec_rel_dat$mode0.1, cex=pt.cex,pch=18,col="green")
+points(prec_rel_dat$mode0.1, cex=pt.cex,pch=18,col="orange")
 axis(4)
 mtext("c)",2,padj=-8.5, las=1, line=3)
 
@@ -115,12 +115,12 @@ abline(h=0)
 abline(v=line_coords, lty=line_lty)
 points(abs_rel_bias$median_rel_bias*100, cex=pt.cex,pch=17,col="red")
 points(abs_rel_bias$mode1_rel_bias*100, cex=pt.cex,pch=15,col="blue")
-points(abs_rel_bias$mode0.1_rel_bias*100, cex=pt.cex,pch=18,col="green")
+points(abs_rel_bias$mode0.1_rel_bias*100, cex=pt.cex,pch=18,col="orange")
 axis(4)
 mtext("d)",2,padj=-8.5, las=1, line=3)
 
 
-legend("topleft",c("mean","median","mode-1","mode-0.1"), cex=1.25,pch=c(19,17,15,18), col=c(1,2,4,3), bty="n")
+legend("topleft",c("mean","median","mode-1","mode-0.1"), cex=1.25,pch=c(19,17,15,18), col=c(1,2,4,"orange"), bty="n")
 
 
 

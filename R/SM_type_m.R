@@ -3,7 +3,7 @@ rm(list=ls())
 library(scales)
 library(beeswarm)
 
-wd <- "~/github/bayes_perm/"
+wd <- "~/github/null_distributions/"
 
 source(paste0(wd,"R/00_functions.R"))
 
@@ -86,10 +86,10 @@ pdf(paste0(wd,"Figures/FigSM_type_m.pdf"), height=9, width=9)
 
 {
 par(mfrow=c(2,2), cex.lab=1.5)
-plot((type_m$mean)/type_m$ICC~ power_dat$mean_boot, col=c(1:4)[factor(type_m$ICC)], pch=19, ylim=c(1,5.5), xlab="Power",ylab="Type M error", main="Mean")
-plot((type_m$median)/type_m$ICC~ power_dat$median_boot, col=c(1:4)[factor(type_m$ICC)], pch=19, ylim=c(1,5.5), xlab="Power",ylab="Type M error", main="Median")
-plot((type_m$mode1)/type_m$ICC~ power_dat$mode1_boot, col=c(1:4)[factor(type_m$ICC)], pch=19, ylim=c(1,5.5), xlab="Power",ylab="Type M error", main="Mode-1")
-plot((type_m$mode0.1)/type_m$ICC~ power_dat$mode0.1_boot, col=c(1:4)[factor(type_m$ICC)], pch=19, ylim=c(1,5.5), xlab="Power",ylab="Type M error", main="Mode-0.1")
+plot((type_m$mean)/type_m$ICC~ power_dat$mean_boot, col=c(1,2,4,"orange")[factor(type_m$ICC)], pch=19, ylim=c(1,5.5), xlab="Power",ylab="Type M error", main="Mean")
+plot((type_m$median)/type_m$ICC~ power_dat$median_boot, col=c(1,2,4,"orange")[factor(type_m$ICC)], pch=19, ylim=c(1,5.5), xlab="Power",ylab="Type M error", main="Median")
+plot((type_m$mode1)/type_m$ICC~ power_dat$mode1_boot, col=c(1,2,4,"orange")[factor(type_m$ICC)], pch=19, ylim=c(1,5.5), xlab="Power",ylab="Type M error", main="Mode-1")
+plot((type_m$mode0.1)/type_m$ICC~ power_dat$mode0.1_boot, col=c(1,2,4,"orange")[factor(type_m$ICC)], pch=19, ylim=c(1,5.5), xlab="Power",ylab="Type M error", main="Mode-0.1")
 
 }
 dev.off()
