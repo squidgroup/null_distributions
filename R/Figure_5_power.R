@@ -92,7 +92,7 @@ hist(subset(actual, ICC==0.1 & N_within==2 & N_group==80)$median)
 
 
 setEPS()
-pdf(paste0(wd,"Figures/Fig6_power.pdf"), height=5, width=10)
+pdf(paste0(wd,"Figures/Fig5_power.pdf"), height=5, width=10)
 
 {
 ICCs <- c(0,0.1,0.2,0.4)
@@ -101,7 +101,7 @@ par(mfrow=c(1,2),mar=c(4,4,2,1), cex.axis=0.75, mgp=c(2,0.5,0))
 plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power / FPR",  ylim=c(0,1),)
 abline(h=0.05, col="grey")
 # legend("topleft",c("power","perm","boot","ICC=0","ICC=0.1","ICC=0.2","ICC=0.4"), pch=c(17,18,19,rep(NA,4)), col=c("grey","grey","grey",1:4),pt.bg=c("grey"), lty=c(0,0,0,1,1,1,1),lwd=2)
- legend("topleft",c("power","perm","sim"), pch=c(17,18,19), col="grey",pt.bg=c("grey"), bty="n")
+ legend("topleft",c("perm","sim","reduced"), pch=c(18,19,17), col="grey",pt.bg=c("grey"), bty="n")
 	# mtext("a)",3,line=1,adj=0)
 mtext("a)",2,padj=-15, las=1, line=2)
 
