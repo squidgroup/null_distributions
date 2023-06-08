@@ -53,7 +53,7 @@ obs_md_sim <- sampling(stan_md, data = stan_data, pars = params, chains = 3, ite
 obs_est_sim<-sapply(extract(obs_md_sim)[params],median)
 
 ##Permutation tests
-n_perm<-100
+n_perm<-1000
 t1<-system.time({  
   l_rand_ID_data<-ran_ID(data, n_perm)
   res_ID<-unlist(mclapply(1:n_perm,function(x){
@@ -280,5 +280,5 @@ res_GT<-data.frame(
 tapply(res_GT$est,res_GT$type,function(x)mean(x>obs_est_real["sigma2_I2"]))
 
 
-save.image("Data/Intermediate/RR_example_results.RData")
+save(res,obs_est_sim,res_GT,obs_est_real,file="Data/Intermediate/RR_example_results.RData")
 
