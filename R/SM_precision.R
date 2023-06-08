@@ -52,7 +52,7 @@ abline(v=line_coords, lty=c(2,1,2,1,2,1,2))
 
 points(precision$median, pch=17,col="red")
 points(precision$mode1, pch=15,col="blue")
-points(precision$mode0.1, pch=18,col="green")
+points(precision$mode0.1, pch=18,col="orange")
 
 axis(3,c(1,3.5,6),c("",0,""), lwd.ticks=0, line=1, padj=1)
 axis(3,c(1,3.5,6) + 6,c("",0.1,""), lwd.ticks=0, line=1, padj=1)
@@ -66,7 +66,7 @@ axis(1,1:8 *3 -1,rep(c(2,4),4), tick=FALSE, line=1.5)
 
 mtext("N among", side=1, line=-3, outer=TRUE, adj=0)
 mtext("N within", side=1, line=-1.5, outer=TRUE, adj=0)
- legend("topleft",c("mean","median","mode-1","mode-0.1"), pch=c(20,17,15,18), col=c(1,2,4,3), bty="n")
+ legend("topleft",c("mean","median","mode-1","mode-0.1"), pch=c(20,17,15,18), col=c(1,2,4,"orange"), bty="n")
 
 }
 
@@ -87,7 +87,7 @@ abline(v=line_coords, lty=c(2,1,2,1,2,1,2))
 
 points(precision2$median, pch=17,col="red")
 points(precision2$mode1, pch=15,col="blue")
-points(precision2$mode0.1, pch=18,col="green")
+points(precision2$mode0.1, pch=18,col="orange")
 
 axis(3,c(1,3.5,6),c("",0,""), lwd.ticks=0, line=1, padj=1)
 axis(3,c(1,3.5,6) + 6,c("",0.1,""), lwd.ticks=0, line=1, padj=1)

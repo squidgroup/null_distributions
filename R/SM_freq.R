@@ -4,7 +4,7 @@ rm(list=ls())
 library("beeswarm")
 
 library(scales)
-wd <- "~/github/bayes_perm/"
+wd <- "~/github/null_distributions/"
 
 source(paste0(wd,"R/00_functions.R"))
 
@@ -53,7 +53,7 @@ abline(h=0)
 
 points(bias$median_bias, pch=17,col="red")
 points(bias$mode1_bias, pch=15,col="blue")
-points(bias$mode0.1_bias, pch=18,col="green")
+points(bias$mode0.1_bias, pch=18,col="orange")
 points(bias$freq_bias, pch=19,col="purple")
 
 	abline(v=line_coords, lty=c(2,1,2,1,2,1,2))
@@ -76,6 +76,6 @@ mtext("N among", side=1, line=-3, outer=TRUE, adj=0)
 mtext("N within", side=1, line=-1.5, outer=TRUE, adj=0)
 
 
-legend("bottomleft",c("mean","median","mode-1","mode-0.1","freq"), pch=c(20,17,15,18,19), col=c(1,2,4,3,"purple"), bty="n")
+legend("bottomleft",c("mean","median","mode-1","mode-0.1","freq"), pch=c(20,17,15,18,19), col=c(1,2,4,"orange","purple"), bty="n")
 }
 dev.off()

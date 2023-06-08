@@ -79,14 +79,16 @@ pdf(paste0(wd,"Figures/FigSM_power_comp.pdf"), height=5, width=10)
 		legend("topleft",c("median","mean","mode1","mode0.1"), pch=c(18,19,17,15), col="grey",pt.bg=c("grey"), bty="n")
 mtext("a)",2,padj=-15, las=1, line=2)
 
-text(rep(65,4),c(0.1,0.25,0.55,0.97),c("ICC=0","ICC=0.1","ICC=0.2","ICC=0.4"), col=1:4)
+cols <- c(1,2,4,"orange")
+
+text(rep(65,4),c(0.1,0.25,0.55,0.97),c("ICC=0","ICC=0.1","ICC=0.2","ICC=0.4"), col=cols)
 
 
 		for(j in seq_along(ICCs)){
-			points(mean_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=19, type="b")
-			points(median_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=18, type="b")
-			points(mode1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=17, type="b")
-			points(mode0.1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=j, pch=15, type="b")
+			points(mean_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=cols[j], pch=19, type="b")
+			points(median_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=cols[j], pch=18, type="b")
+			points(mode1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=cols[j], pch=17, type="b")
+			points(mode0.1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==2, col=cols[j], pch=15, type="b")
 		
 			# lines(mean_boot~N_group,power_dat, subset=ICC==ICCs[j], col=j, lwd=2)
 		}
@@ -95,10 +97,10 @@ text(rep(65,4),c(0.1,0.25,0.55,0.97),c("ICC=0","ICC=0.1","ICC=0.2","ICC=0.4"), c
 			abline(h=0.05, col="grey")
 			# abline(h=c(0.028,0.081), col="grey")
 			for(j in seq_along(ICCs)){
-				points(mean_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=19, type="b")
-				points(median_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=18, type="b")
-				points(mode1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=17, type="b")
-				points(mode0.1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=j, pch=15, type="b")
+				points(mean_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=cols[j], pch=19, type="b")
+				points(median_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=cols[j], pch=18, type="b")
+				points(mode1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=cols[j], pch=17, type="b")
+				points(mode0.1_boot~N_group,power_dat, subset=ICC==ICCs[j]&N_within==4, col=cols[j], pch=15, type="b")
 			# lines(mean_boot~N_group,power_dat, subset=ICC==ICCs[j], col=j, lwd=2)
 			}
 			mtext("b)",2,padj=-15, las=1, line=2)
