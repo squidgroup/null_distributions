@@ -15,10 +15,10 @@ pdf(paste0(wd,"Figures/FigSM_fay.pdf"), height=6, width=6)
 par(mar=c(4,4,1,1))
 plot(results_sum[,"n"],results_sum[,"mean"], ylim=c(0,0.3), type="b", pch=19, col=1, ylab="Mean Estimate ", xlab="Number of Individuals")
 points(results_sum[,"n"],results_sum[,"median"], type="b", pch=19, col=2)
-points(results_sum[,"n"],results_sum[,"mode0.1"], type="b", pch=19, col=3)
+points(results_sum[,"n"],results_sum[,"mode0.1"], type="b", pch=19, col="orange")
 points(results_sum[,"n"],results_sum[,"mode1"], type="b", pch=19, col=4)
 abline(h=0.2^2, col="grey")
-legend("topright",c("mean","median","mode-0.1","mode-1"), pch=19, col=c(1,2,3,4), bty="n")
+legend("topright",c("mean","median","mode-0.1","mode-1"), pch=19, col=c(1,2,"orange",4), bty="n")
 
 }
 dev.off()
