@@ -98,7 +98,7 @@ pdf(paste0(wd,"Figures/Fig5_power.pdf"), height=5, width=10)
 ICCs <- c(0,0.1,0.2,0.4)
 	power_dat <- aggregate(cbind(mode1_boot,mode0.1_boot,mean_boot,median_boot,median_perm)~N_group+ N_within+ICC,all,function(x) mean(x<0.05))
 par(mfrow=c(1,2),mar=c(4,4,2,1), cex.axis=0.75, mgp=c(2,0.5,0))
-plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power / FPR",  ylim=c(0,1),)
+plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power  or  FPR",  ylim=c(0,1),)
 abline(h=0.05, col="grey")
 # legend("topleft",c("power","perm","boot","ICC=0","ICC=0.1","ICC=0.2","ICC=0.4"), pch=c(17,18,19,rep(NA,4)), col=c("grey","grey","grey",1:4),pt.bg=c("grey"), lty=c(0,0,0,1,1,1,1),lwd=2)
  legend("topleft",c("perm","sim","reduced"), pch=c(18,19,17), col="grey",pt.bg=c("grey"), bty="n")
@@ -115,7 +115,7 @@ for(j in seq_along(ICCs)){
 
 text(rep(65,4),c(0.1,0.25,0.55,0.97),c("ICC=0","ICC=0.1","ICC=0.2","ICC=0.4"), col=cols)
 
-plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power / FPR",  ylim=c(0,1))
+plot(NA,xlim=c(20,80),xlab="Number of Groups", ylab="Power  or  FPR",  ylim=c(0,1))
 abline(h=0.05, col="grey")
 # abline(h=c(0.028,0.081), col="grey")
 for(j in seq_along(ICCs)){
